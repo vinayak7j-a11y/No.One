@@ -13,8 +13,6 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://noone.so"),
-
   title: {
     default: "No.One",
     template: "%s | No.One",
@@ -25,37 +23,19 @@ export const metadata: Metadata = {
 
   applicationName: "No.One",
 
-  authors: [
-    {
-      name: "Vinayak Joshi",
-    },
-  ],
+  authors: [{ name: "Vinayak Joshi" }],
 
   creator: "Vinayak Joshi",
 
   keywords: [
     "Vinayak Joshi",
     "No.One",
-    "Digital HQ",
     "Founder",
-    "Startup",
     "Portfolio",
-    "Projects",
-    "Engineering",
     "AI",
+    "Startups",
+    "Engineering",
   ],
-
-  openGraph: {
-    title: "No.One",
-    description: "The Digital Headquarters of Vinayak Joshi.",
-    type: "website",
-    locale: "en_US",
-  },
-
-  robots: {
-    index: true,
-    follow: true,
-  },
 };
 
 export default function RootLayout({
