@@ -11,7 +11,19 @@
   --border: #27272a;
 
   --card: #09090b;
+--accent: #3b82f6;
+  --accent-foreground: #ffffff;
 
+  --success: #22c55e;
+  --success-foreground: #ffffff;
+
+  --warning: #eab308;
+  --warning-foreground: #09090b;
+
+  --danger: #ef4444;
+  --danger-foreground: #ffffff;
+
+  --ring: var(--accent);
   /* Radius */
   --radius: 14px;
 
@@ -24,6 +36,90 @@
 
 * {
   box-sizing: border-box;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --text-display: 4.5rem;
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.03em;
+
+  --text-h1: 3rem;
+  --text-h1--line-height: 1.1;
+  --text-h1--letter-spacing: -0.025em;
+
+  --text-h2: 2.25rem;
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.02em;
+
+  --text-h3: 1.75rem;
+  --text-h3--line-height: 1.25;
+  --text-h3--letter-spacing: -0.015em;
+
+  --text-h4: 1.375rem;
+  --text-h4--line-height: 1.35;
+  --text-h4--letter-spacing: -0.01em;
+
+  --text-h5: 1.125rem;
+  --text-h5--line-height: 1.4;
+  --text-h5--letter-spacing: -0.005em;
+
+  --text-h6: 1rem;
+  --text-h6--line-height: 1.5;
+  --text-h6--letter-spacing: 0em;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.65;
+  --text-body-lg--letter-spacing: 0em;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+  --text-body--letter-spacing: 0em;
+
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.6;
+  --text-body-sm--letter-spacing: 0em;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+  --text-caption--letter-spacing: 0.08em; 
+/* Layout — aliases --max-width into Tailwind's container namespace so
+     `max-w-content` is a real utility instead of a hardcoded max-w-7xl
+     that happens to match the same number. */
+  --container-content: var(--max-width);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-ring: var(--ring);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.6);
+  --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.04);
+  --shadow-lg: 0 24px 48px -12px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
+
+  --z-index-sticky: 40;
+  --z-index-dropdown: 50;
+  --z-index-overlay: 60;
+  --z-index-modal: 70;
+  --z-index-toast: 80;
+  --z-index-tooltip: 90;
 }
 
 html {

@@ -1,23 +1,26 @@
-import Container from "@/components/layout/Container";
+import PageLayout from "@/components/layout/PageLayout";
+import Section from "@/components/layout/Section";
+import Heading from "@/components/ui/Heading";
+import Text from "@/components/ui/Text";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex items-center">
-      <Container>
+    <PageLayout>
+      <Section spacing="lg" className="flex flex-1 items-center">
         <div className="text-center">
-          <p className="text-sm uppercase tracking-[0.4em] text-neutral-500">
+          <Text as="p" size="caption" tone="subtle">
             Vinayak Joshi
-          </p>
+          </Text>
 
-          <h1 className="mt-4 text-6xl font-bold tracking-tight">
+          <Heading as="h1" size="display" className="mt-4">
             No.One
-          </h1>
+          </Heading>
 
-          <p className="mt-6 text-neutral-400 max-w-xl mx-auto">
+          <Text size="lg" tone="muted" className="mt-6 max-w-xl mx-auto">
             The Digital Headquarters of Vinayak Joshi.
-          </p>
+          </Text>
         </div>
-      </Container>
-    </main>
+      </Section>
+    </PageLayout>
   );
 }

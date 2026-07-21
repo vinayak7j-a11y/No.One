@@ -63,3 +63,25 @@ No.One is not a portfolio.
 Reason
 
 It is a Digital HQ that grows over time.
+
+---
+
+## ADR-008
+
+Date
+
+21 July 2026
+
+Decision
+
+`Section` owns vertical rhythm (`spacing` variant) and optional
+background fill; it wraps children in `Container` by default rather
+than requiring every page to nest `<Section><Container>` manually.
+`PageLayout` owns the top-level `<main>` shell separately from `Section`.
+
+Reason
+
+Keeps the three concerns — page shell, vertical rhythm, horizontal
+width — each in exactly one component, so a future Hero/About/Projects
+section only writes `<Section spacing="lg">...</Section>` instead of
+re-deriving padding and container nesting every time.
