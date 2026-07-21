@@ -85,3 +85,27 @@ Keeps the three concerns — page shell, vertical rhythm, horizontal
 width — each in exactly one component, so a future Hero/About/Projects
 section only writes `<Section spacing="lg">...</Section>` instead of
 re-deriving padding and container nesting every time.
+
+
+---
+
+## ADR-010
+
+Date
+
+21 July 2026
+
+Decision
+
+`NavLink` is a separate component from `Button`, not a `Button` variant.
+`Navbar` renders desktop nav links directly; mobile collapse is deferred
+to `MobileMenu.tsx` as its own task rather than being added inline.
+
+Reason
+
+Nav items need active-route awareness (`usePathname` + `aria-current`)
+that a general-purpose button has no reason to carry, and forcing that
+logic into `Button` would make it a client component unconditionally.
+Keeping mobile nav as a separate task avoids growing this commit into
+two unrelated concerns (desktop structure vs. responsive disclosure
+pattern) at once.
