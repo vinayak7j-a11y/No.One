@@ -150,3 +150,26 @@ img {
   display: block;
   max-width: 100%;
 }
+/* Focus visibility — every interactive element gets a consistent,
+   keyboard-only focus ring using the --ring token, instead of each
+   future component (Button, Input, Nav link) redefining its own. */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Respect the OS-level reduced-motion preference site-wide. Framer
+   Motion components should still pair this with the useReducedMotion
+   hook (hooks/useReducedMotion.ts) to swap animations for instant
+   state changes rather than just shortening them. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
