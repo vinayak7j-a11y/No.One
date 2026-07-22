@@ -20,7 +20,7 @@ Sprint 1
 
 Current Task
 
-TBD — to be scoped when picked up
+Phase 1 complete — Phase 2 (Core UI System continued / Sections) not yet scoped
 
 Next Task
 
@@ -28,7 +28,42 @@ TBD
 
 Overall Progress
 
-11 / 48 Tasks Complete
+13 / 48 Tasks Complete
+
+---
+
+## Completed: P1-T13 Footer
+
+- Built `components/navigation/Footer.tsx`: copyright line (auto-updating
+  year) + the same `NAV_ITEMS` list (from `config/site.ts`, P1-T10) that
+  `Navbar`/`MobileMenu` already read from — no duplicated link list.
+- Wired `Footer` into `app/layout.tsx` alongside `Navbar`.
+- **Fixed a real layout bug while wiring it in**: `PageLayout` owned its
+  own `min-h-screen`, which doesn't account for sibling Navbar/Footer
+  height — adding Footer as a sibling after `{children}` would have
+  pushed total page height past one viewport on short pages, causing
+  unwanted scroll. Fixed with the standard sticky-footer pattern:
+  `<body>` now owns `flex min-h-screen flex-col`, and `PageLayout`
+  changed from `min-h-screen` to `flex-1`, so it fills exactly the
+  space left between Navbar and Footer instead of claiming a full
+  extra viewport on top of them.
+- Verified with `tsc --noEmit`, `eslint`, and a Turbopack build pass
+  (clean; same known Google Fonts network limitation as prior tasks).
+
+---
+
+## Completed: P1-T12 Card Component
+
+- Built `components/ui/Card.tsx`: the site-wide surface primitive for
+  project cards, note previews, form groupings — anything that needs
+  to read as a distinct block on the pure-black background.
+- `padding` variant (`none`/`sm`/`md`/`lg`, default `md`) and `hover`
+  variant (boolean — border brightens on hover for clickable cards).
+- Uses `border-border` + `bg-card` at rest rather than a shadow, per
+  ADR-007's reasoning that a border reads more reliably than a shadow
+  on a pure-black (`#000`) surface; instances needing elevation can
+  still add a `shadow-*` utility (P1-T05) directly.
+- Verified with `tsc --noEmit` and `eslint` (clean).
 
 ---
 
@@ -157,9 +192,8 @@ Overall Progress
   sections. `spacing` variant (`sm`/`md`/`lg`/`none`) controls y-padding,
   `background` variant (`transparent`/`card`) controls fill, and
   `container` prop (default true) wraps children in `Container`.
-- Built `PageLayout.tsx`: top-level `<main>` shell (`min-h-screen flex
-  flex-col`) every page renders into, so page-level structure lives in
-  one place ahead of Navbar/Footer landing in Phase 2.
+- Built `PageLayout.tsx`: top-level `<main>` shell every page renders
+  into, so page-level structure lives in one place.
 - Migrated `app/page.tsx` to `PageLayout` + `Section` instead of a raw
   `<main>` — same visual result, now composed from the reusable system.
 - Verified with `tsc --noEmit` and `eslint` (clean), and confirmed via a
@@ -270,15 +304,17 @@ Phase 1
 
 Progress
 
-10 / 12
+12 / 12
 
 Status
 
-In Progress
+Complete
 
 Phase 2
 
-Waiting
+In Progress (Core UI System items — Button, Navigation, Footer, Card —
+already built during Phase 1 as prerequisites; Badge, Input, Separator,
+and actual page content remain)
 
 Phase 3
 

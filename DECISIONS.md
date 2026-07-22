@@ -232,3 +232,52 @@ silently overriding the `text-background` utility class on Button's
 Tailwind's own preflight already resets `a { color: inherit }` inside
 `@layer base` for exactly this reason — our custom CSS needs to live in
 the same layer system to compose correctly with it instead of fighting it.
+
+
+---
+
+## ADR-013
+
+Date
+
+22 July 2026
+
+Decision
+
+`Card` rests on `border-border` + `bg-card` rather than a `box-shadow`
+by default; elevation via `shadow-*` is opt-in per instance, not built
+into the component.
+
+Reason
+
+On a pure-black (`#000`) background, a standard shadow is close to
+invisible at rest (same reasoning as ADR-007's shadow-scale design) —
+a visible border is the more reliable default signal that something is
+a distinct surface. Cards that genuinely need to appear "lifted" (e.g.
+a hovering dropdown-like card) can still add `shadow-md`/`shadow-lg`
+directly since those tokens already exist.
+
+---
+
+## ADR-014
+
+Date
+
+22 July 2026
+
+Decision
+
+`<body>` in `app/layout.tsx` owns `flex min-h-screen flex-col`, not
+`PageLayout`. `PageLayout` was changed from `min-h-screen` to `flex-1`.
+
+Reason
+
+Adding `Footer` as a sibling after `{children}` exposed a bug:
+`PageLayout`'s own `min-h-screen` doesn't know Navbar/Footer exist, so
+on a short page the total stack (Navbar + a full extra viewport from
+PageLayout + Footer) would exceed one viewport height, causing
+unwanted scroll and pushing Footer below the fold. The standard
+sticky-footer fix is for the outermost flex container spanning
+Navbar/main/Footer to own the `min-h-screen`, with the middle section
+taking `flex-1` to absorb exactly the remaining space — so that's now
+`<body>`'s job, not `PageLayout`'s.
