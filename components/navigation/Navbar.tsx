@@ -1,22 +1,17 @@
 import Link from "next/link";
 import Container from "@/components/layout/Container";
 import NavLink from "@/components/navigation/NavLink";
-
-const NAV_ITEMS = [
-  { href: "/about", label: "About" },
-  { href: "/projects", label: "Projects" },
-  { href: "/notes", label: "Notes" },
-  { href: "/contact", label: "Contact" },
-] as const;
+import MobileMenu from "@/components/navigation/MobileMenu";
+import { NAV_ITEMS } from "@/config/site";
 
 /**
  * Site-wide navigation header, rendered once in app/layout.tsx.
- * Desktop-only for now — MobileMenu.tsx (still a stub) will handle the
- * collapsed nav in a follow-up task rather than being bolted on here.
+ * Desktop nav renders inline; MobileMenu owns the collapsed/mobile
+ * experience so this component doesn't carry open/close state itself.
  */
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-sticky border-b border-border bg-background/80 backdrop-blur">
+    <header className="sticky top-0 z-sticky border-b border-border bg-background/80 backdrop-blur relative">
       <Container>
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="text-body font-semibold text-foreground">
@@ -30,6 +25,8 @@ export default function Navbar() {
               </NavLink>
             ))}
           </nav>
+
+          <MobileMenu />
         </div>
       </Container>
     </header>

@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 export default function Home() {
   return (
     <PageLayout>
-      <Section spacing="lg" className="flex flex-1 items-center">
+      <Section spacing="none" className="flex flex-1 items-center">
         <div className="text-center">
           <Text as="p" size="caption" tone="subtle">
             Vinayak Joshi

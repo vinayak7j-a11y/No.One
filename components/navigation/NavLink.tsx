@@ -8,6 +8,7 @@ interface NavLinkProps {
   href: string;
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
 /**
@@ -15,13 +16,14 @@ interface NavLinkProps {
  * Kept separate from Button since nav items need active-state styling
  * that a generic button variant shouldn't have to carry.
  */
-export default function NavLink({ href, children, className }: NavLinkProps) {
+export default function NavLink({ href, children, className, onClick }: NavLinkProps) {
   const pathname = usePathname();
   const isActive = pathname === href;
 
   return (
     <Link
       href={href}
+      onClick={onClick}
       aria-current={isActive ? "page" : undefined}
       className={cn(
         "text-body-sm font-medium transition-colors duration-200",

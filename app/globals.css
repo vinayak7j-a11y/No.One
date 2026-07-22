@@ -11,9 +11,14 @@
   --border: #27272a;
 
   --card: #09090b;
---accent: #3b82f6;
+
+  /* Accent — single brand accent used sparingly for links, focus states,
+     and primary actions. Swap this one value to re-theme the whole site. */
+  --accent: #3b82f6;
   --accent-foreground: #ffffff;
 
+  /* Semantic state colors — for future form validation, alerts, and
+     feedback components (components/feedback, components/forms). */
   --success: #22c55e;
   --success-foreground: #ffffff;
 
@@ -23,7 +28,10 @@
   --danger: #ef4444;
   --danger-foreground: #ffffff;
 
+  /* Focus ring — defaults to the accent so keyboard focus is always
+     visible without every component re-declaring a color. */
   --ring: var(--accent);
+
   /* Radius */
   --radius: 14px;
 
@@ -34,14 +42,15 @@
   --transition: 200ms ease;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 @theme inline {
+  /* Font families (populated by next/font variables in layout.tsx) */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
+  /* Type scale
+     Every size ships with a matched line-height and letter-spacing
+     so `text-*` utilities are correct by default — no per-usage
+     leading/tracking guesswork across the app. */
   --text-display: 4.5rem;
   --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.03em;
@@ -84,11 +93,16 @@
 
   --text-caption: 0.75rem;
   --text-caption--line-height: 1.4;
-  --text-caption--letter-spacing: 0.08em; 
-/* Layout — aliases --max-width into Tailwind's container namespace so
+  --text-caption--letter-spacing: 0.08em;
+
+  /* Layout — aliases --max-width into Tailwind's container namespace so
      `max-w-content` is a real utility instead of a hardcoded max-w-7xl
      that happens to match the same number. */
   --container-content: var(--max-width);
+
+  /* Color aliases — expose the semantic palette as real Tailwind
+     utilities (bg-background, text-muted, border-border, etc.)
+     instead of hand-writing var(--x) everywhere. */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
@@ -105,15 +119,22 @@
   --color-danger-foreground: var(--danger-foreground);
   --color-ring: var(--ring);
 
+  /* Radius scale — `rounded-md` is the site default (14px), matching
+     the design system's single --radius value. */
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-full: 9999px;
 
+  /* Shadow scale — tuned for a pure-black surface: elevation reads via
+     a faint white hairline plus a soft black falloff, since a normal
+     light-mode drop shadow is invisible on #000. */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.6);
   --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.04);
   --shadow-lg: 0 24px 48px -12px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
 
+  /* Z-index scale — single source of truth for stacking context,
+     for future dropdowns, modals, toasts, and tooltips. */
   --z-index-sticky: 40;
   --z-index-dropdown: 50;
   --z-index-overlay: 60;
@@ -122,54 +143,67 @@
   --z-index-tooltip: 90;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+/* Wrapped in @layer base so these rules follow Tailwind's normal cascade
+   priority (utilities > components > base) instead of silently winning
+   over every utility class regardless of specificity — unlayered CSS
+   always beats layered CSS in the cascade, which is what caused the
+   Button "primary" variant's text to render invisible (a { color:
+   inherit } was overriding text-background on the <Link>). */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
 
-body {
-  margin: 0;
-  background: var(--background);
-  color: var(--foreground);
+  html {
+    scroll-behavior: smooth;
+  }
 
-  font-family: var(--font-geist-sans);
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
 
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-}
+    font-family: var(--font-geist-sans);
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
 
-button {
-  font: inherit;
-}
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-img {
-  display: block;
-  max-width: 100%;
-}
-/* Focus visibility — every interactive element gets a consistent,
-   keyboard-only focus ring using the --ring token, instead of each
-   future component (Button, Input, Nav link) redefining its own. */
-:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
+  button {
+    font: inherit;
+  }
 
-/* Respect the OS-level reduced-motion preference site-wide. Framer
-   Motion components should still pair this with the useReducedMotion
-   hook (hooks/useReducedMotion.ts) to swap animations for instant
-   state changes rather than just shortening them. */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Focus visibility — every interactive element gets a consistent,
+     keyboard-only focus ring using the --ring token, instead of each
+     future component (Button, Input, Nav link) redefining its own. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Respect the OS-level reduced-motion preference site-wide. Framer
+     Motion components should still pair this with the useReducedMotion
+     hook (hooks/useReducedMotion.ts) to swap animations for instant
+     state changes rather than just shortening them. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
