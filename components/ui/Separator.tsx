@@ -20,7 +20,7 @@ export interface SeparatorProps
 /**
  * Visual divider primitive — between Card sections, form groups, footer
  * columns, or nav items laid out horizontally. Purely presentational
- * (`role="none"`, `aria-hidden`); wrap in a semantic element separately
+ * (`role="none"`); wrap in a semantic element separately
  * if a divider needs to carry meaning (e.g. an `<hr>` in prose content).
  */
 export default function Separator({
