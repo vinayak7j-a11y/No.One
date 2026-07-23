@@ -20,15 +20,37 @@ Sprint 1
 
 Current Task
 
-P2-T03 Separator Component complete — Phase 2 UI primitives done
+P2-T04 /about page complete
 
 Next Task
 
-TBD (real page content, e.g. /about)
+TBD (/projects, /notes, or /contact)
 
 Overall Progress
 
-16 / 48 Tasks Complete
+17 / 48 Tasks Complete
+
+---
+
+## Completed: P2-T04 /about Page
+
+- Built `app/about/page.tsx`: first real content page, replacing the
+  404 previously linked from Navbar/Footer/homepage.
+- Composed entirely from existing primitives — `PageLayout`, `Section`
+  (`spacing="lg"`), `Heading` (`size="h1"`), `Text` (`size="lg"
+  tone="muted"`) — no new components needed.
+- Copy: "Karma, not categories." — reframes the site's premise as one
+  continuous practice across work/health/relationships/adventure rather
+  than separate life categories, and positions the site itself as a
+  digital headquarters pulling together GitHub/YouTube/X/LinkedIn into
+  one record rather than a highlight reel.
+- Body copy constrained to `max-w-2xl` for readable line length,
+  independent of the page's wider `max-w-content` container.
+- Used `&apos;` for all apostrophes in JSX text to satisfy
+  `react/no-unescaped-entities` (Next.js's default ESLint config).
+- Verified with `tsc --noEmit`, `eslint`, and a live `next dev` check
+  in-browser (layout, spacing, nav active-state, and route flow from
+  `/` all confirmed working).
 
 ---
 
