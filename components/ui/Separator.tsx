@@ -31,7 +31,6 @@ export default function Separator({
   return (
     <div
       role="none"
-      aria-hidden="true"
       className={cn(separatorVariants({ orientation }), className)}
       {...props}
     />

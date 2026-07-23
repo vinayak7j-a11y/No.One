@@ -20,15 +20,35 @@ Sprint 1
 
 Current Task
 
-P2-T02 Input Component complete — Separator next
+P2-T03 Separator Component complete — Phase 2 UI primitives done
 
 Next Task
 
-P2-T03 Separator Component
+TBD (real page content, e.g. /about)
 
 Overall Progress
 
-15 / 48 Tasks Complete
+16 / 48 Tasks Complete
+
+---
+
+## Completed: P2-T03 Separator Component
+
+- Built `components/ui/Separator.tsx`: visual divider primitive for
+  Card sections, form groups, and horizontally laid-out nav/footer
+  items.
+- `orientation` variant (`horizontal`/`vertical`) via `cva`, using only
+  `bg-border` — no new tokens needed.
+- Purely presentational: `role="none"` + `aria-hidden="true"`, since a
+  visual rule has no semantic meaning by default. A caller needing an
+  actual semantic divider (e.g. in prose) should use `<hr>` directly
+  instead of this component.
+- No `forwardRef` needed (matches Card/Badge, not Button/Input) — a
+  static div with no ref-consuming use case.
+- Verified with `tsc --noEmit` and `eslint` (clean).
+- **Closes out Phase 2's UI primitive set** (Badge, Input, Separator).
+  Remaining Phase 2 work is real page content: /about, /projects,
+  /notes, /contact.
 
 ---
 
