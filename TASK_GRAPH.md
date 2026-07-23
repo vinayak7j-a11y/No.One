@@ -20,15 +20,30 @@ Sprint 1
 
 Current Task
 
-Phase 1 complete — Phase 2 (Core UI System continued / Sections) not yet scoped
+P2-T01 Badge Component complete — Input next
 
 Next Task
 
-TBD
+P2-T02 Input Component
 
 Overall Progress
 
-13 / 48 Tasks Complete
+14 / 48 Tasks Complete
+
+---
+
+## Completed: P2-T01 Badge Component
+
+- Built `components/ui/Badge.tsx`: status/label primitive for tags on
+  project cards, note categories, and status indicators.
+- `variant` (`default`/`accent`/`success`/`warning`/`danger`/`outline`)
+  and `size` (`sm`/`md`) variants, built entirely from existing tokens —
+  reuses the `success`/`warning`/`danger` state colors from Design
+  Tokens (P1-T05), so it shares vocabulary with Button's `destructive`
+  variant rather than inventing new colors.
+- No polymorphism/forwardRef needed (unlike Button) — Badge is always
+  a `<span>`, never needs to render as a link.
+- Verified with `tsc --noEmit` and `eslint` (clean).
 
 ---
 
@@ -312,9 +327,9 @@ Complete
 
 Phase 2
 
-In Progress (Core UI System items — Button, Navigation, Footer, Card —
-already built during Phase 1 as prerequisites; Badge, Input, Separator,
-and actual page content remain)
+In Progress (Badge done; Button, Navigation, Footer, Card already
+built during Phase 1 as prerequisites; Input, Separator, and actual
+page content remain)
 
 Phase 3
 
