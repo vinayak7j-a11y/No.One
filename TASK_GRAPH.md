@@ -20,15 +20,32 @@ Sprint 1
 
 Current Task
 
-P2-T01 Badge Component complete — Input next
+P2-T02 Input Component complete — Separator next
 
 Next Task
 
-P2-T02 Input Component
+P2-T03 Separator Component
 
 Overall Progress
 
-14 / 48 Tasks Complete
+15 / 48 Tasks Complete
+
+---
+
+## Completed: P2-T02 Input Component
+
+- Built `components/ui/Input.tsx`: the site-wide text input primitive,
+  built with the future Contact form (P2-T05+) in mind but generic
+  enough for any labeled field.
+- Composes `label`, the `<input>` itself, and `error`/`helperText` into
+  one unit, wiring `aria-invalid`/`aria-describedby` automatically so
+  forms don't have to hand-build accessible error states themselves.
+- `state` (`default`/`error`) and `size` (`sm`/`md`/`lg`) variants via
+  `cva`, matching Button's variant/size pattern. `state` is normally
+  driven by passing `error` rather than set directly.
+- Uses `forwardRef` (like Button, unlike Card/Badge) since form inputs
+  commonly need ref access for focus management and validation libs.
+- Verified with `tsc --noEmit` and `eslint` (clean).
 
 ---
 
