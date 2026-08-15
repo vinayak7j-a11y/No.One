@@ -394,4 +394,73 @@ Phase 3
 
 Waiting
 
-...
+...## Completed: P2-T05 /projects Page (Ventures Module)
+
+- Built `app/projects/page.tsx` and `components/ventures/VentureRow.tsx`,
+  replacing the earlier scroll-driven "thread" prototype (a single
+  continuous line drawn by scroll position, with per-node status
+  confirming as the drawn ink reached it).
+- Design journey went through three real iterations before landing
+  here:
+  - **V1** (static card list with status badges) — rejected: read as a
+    conventional portfolio despite the vocabulary, not a rethought
+    interaction model.
+  - **V2** (vertical spine, per-row `IntersectionObserver` fade-in) —
+    self-identified as a failure: functionally the same pattern as
+    AOS.js/GSAP ScrollTrigger scroll-reveal used on countless landing
+    pages, just relabeled. Dressing a generic effect in No.One
+    vocabulary doesn't make it native to No.One.
+  - **V3** (thread-draws-progressively, single shared line, node status
+    confirms at the pixel the ink reaches it) — built, type-checked,
+    but on review the *shape* itself (vertical line + dot markers +
+    left-label/right-status) was recognized as a standard roadmap/
+    changelog component regardless of how the reveal animates. Still
+    failed the standing rejection test: "if this interaction could be
+    dropped unchanged into a SaaS landing page, it's probably not the
+    right interaction for No.One."
+  - **Current (V4)**: no shared line, no dots, no status tag visible
+    by default. All five venture names rest at equal visual weight
+    (Law of Rest / Non-Ranking). Status and description are hidden
+    entirely until a specific venture receives attention — hover,
+    keyboard focus, or tap-to-pin all drive the identical `active`
+    state (Law of Attention: intent, not input device). Losing
+    attention collapses the reveal back to rest (Law of Return, no
+    "close" affordance). A soft pointer-tracked glow (desktop-only,
+    decorative, gated to `pointerType === "mouse"`) is the one
+    signature flourish.
+- **Real bug found and fixed during build, worth logging**: an early
+  version merged mouse-hover and keyboard-focus into a single JS state
+  flag. On touch, tapping a venture both set `pinned` *and* focused the
+  button; since focus doesn't clear on a second tap of an
+  already-focused element (no `blur` fires), the merged flag stayed
+  stuck "active" even after `pinned` toggled back off — the second tap
+  silently failed to close it. Fixed by separating `hovered` / `focused`
+  / `pinned` into three independent state variables (`active = hovered
+  || focused || pinned`), and by blurring the trigger specifically on
+  touch-originated clicks (detected via `onPointerDown`'s `pointerType`,
+  which has no equivalent before a keyboard-triggered click, so
+  keyboard focus behavior is untouched).
+- `data/ventures.ts` recreated (was deleted by an unexplained local
+  commit, `7158934`, outside any Claude chat — see below). Same shape
+  as before: `identity` / `content` / `relations`, no `behavior` field
+  (behavior is shared physics, not per-artifact data). `relations`
+  arrays remain empty on all five ventures — no real connections
+  between ventures have been confirmed by the person, and inventing
+  one was explicitly rejected earlier as fabricating a fact not in
+  evidence.
+- Deleted `components/ventures/VentureThread.tsx` and
+  `hooks/useInView.ts` as obsolete — neither is imported anywhere post-
+  rebuild, following the same "remove rather than leave as dead code"
+  precedent as V2's `useInView` removal.
+- **Also resolved this task**: two unexplained local commits
+  (`e1efeda`, `7158934`) flagged in a prior handoff as needing
+  inspection. Confirmed via `git show` that both touch only one line of
+  `package.json` each — `@tabler/icons-react` added then removed, net
+  zero — nothing else dangling. Origin of the commits (and of the four
+  files `7158934` deleted) remains unexplained, but the diffs
+  themselves are confirmed clean.
+- Verified with `tsc --noEmit` and `eslint` (both clean). **Not yet
+  verified live in-browser** — unlike every prior entry in this file,
+  double-tap-to-close on touch, keyboard-focus traversal, and visual
+  read against the "not a SaaS template" bar are still pending manual
+  confirmation. Update this line once done.
