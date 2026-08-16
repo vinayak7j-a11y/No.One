@@ -394,7 +394,7 @@ Phase 3
 
 Waiting
 
-...## Completed: P2-T05 /projects Page (Ventures Module)
+## Completed: P2-T05 /projects Page (Ventures Module)
 
 - Built `app/projects/page.tsx` and `components/ventures/VentureRow.tsx`,
   replacing the earlier scroll-driven "thread" prototype (a single
@@ -464,3 +464,64 @@ Waiting
   double-tap-to-close on touch, keyboard-focus traversal, and visual
   read against the "not a SaaS template" bar are still pending manual
   confirmation. Update this line once done.
+
+## Completed: P2-T06 /contact Page
+
+- Built `components/contact/ContactChannel.tsx`,
+  `components/contact/MessageComposer.tsx`, and `app/contact/page.tsx`.
+- Reused Ventures' attention grammar rather than inventing a new one:
+  each channel (Email, X, LinkedIn, GitHub) rests at equal weight with
+  no badge/icon hierarchy, and reveals its handle plus a one-line
+  blurb only on hover, keyboard focus, or tap-to-pin, same hovered,
+  focused, pinned state split as VentureRow, including the same touch
+  stuck-state fix (see P2-T05).
+- Rejected the default "form always visible" pattern as the single
+  most SaaS-template-shaped artifact possible. The message composer
+  doesn't exist in the page's visible state at rest at all, it's
+  collapsed behind a quiet "or write directly" toggle, expanding only
+  on explicit engagement (Law of Rest applied to the form itself, not
+  just individual fields).
+- MessageComposer uses the existing Input primitive (P1-T02) for
+  Name/Email as originally intended, plus a plain textarea for
+  Message (no Textarea primitive exists yet, worth a future task if a
+  second use case shows up). Submit is wired to a placeholder mailto:
+  handler with prefilled subject/body; no real backend (Resend,
+  Formspree, custom API route) has been chosen yet.
+- PLACEHOLDER data, not yet real: all four channel handles/hrefs
+  (hello@example.com, @example, etc.) in app/contact/page.tsx are
+  placeholders pending the person's real handles, same "don't
+  fabricate facts" rule as data/ventures.ts.
+- Real, previously undetected bug found and fixed: Button's primary
+  variant was rendering invisible white-on-white text whenever paired
+  with a size variant. Root cause was in lib/utils/cn.ts: twMerge had
+  no awareness of the project's custom typography scale (text-body,
+  text-h1, etc., P1-T04) or custom color tokens (text-background,
+  P1-T05), since both are defined via @theme inline rather than
+  anything twMerge reads by default. twMerge's stock font-size group
+  only recognizes standard values (text-sm, text-lg...), so it did
+  not classify text-body as a font-size utility; its color-group
+  matching is looser and likely misclassified text-body into the same
+  conflict group as text-background. Since cva applies the size
+  variant after the variant variant, twMerge's last-wins conflict
+  resolution silently dropped text-background, leaving the button's
+  text color to fall back to the inherited text-foreground (white)
+  against its own white bg-foreground fill. Fixed by configuring
+  extendTailwindMerge in cn.ts with an explicit font-size class group
+  listing all ten custom typography classes. This is a shared utility
+  used by every components/ui primitive, so the fix applies sitewide,
+  confirmed via DevTools Computed panel (color: #FFFFFF on background:
+  #FFFFFF before the fix, visible dark-on-white "Send" label after).
+- Verified live in-browser, not just tsc/eslint, a first for this
+  project's Contact-adjacent work: mailto compose flow confirmed
+  end-to-end (real Gmail compose window populated correctly with
+  To/Subject/Body/From), native browser required-field validation
+  confirmed on empty submit, hover reveal confirmed on a real channel
+  (LinkedIn, browser status bar showed the correct href), and the
+  Button fix confirmed visually post-patch on a mobile-responsive
+  viewport.
+- Deferred, flagged decision: whole-site visual density ("looks
+  empty/simple", large unused space on wide viewports, no imagery
+  anywhere, sparse copy) was raised and explicitly deferred until
+  Notes/Startups exist to fill it out, rather than guessed at now.
+  Revisit once more content-bearing pages exist.
+- Verified with tsc --noEmit and eslint (clean).
