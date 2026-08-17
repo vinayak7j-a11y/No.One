@@ -3,6 +3,7 @@ import Container from "@/components/layout/Container";
 import NavLink from "@/components/navigation/NavLink";
 import MobileMenu from "@/components/navigation/MobileMenu";
 import ThemeToggle from "@/components/navigation/ThemeToggle";
+import SearchPalette from "@/components/navigation/SearchPalette";
 import { NAV_ITEMS } from "@/config/site";
 
 /**
@@ -26,6 +27,7 @@ export default function Navbar() {
                 </NavLink>
               ))}
             </nav>
+            <SearchPalette />
             <ThemeToggle />
             <MobileMenu />
           </div>
