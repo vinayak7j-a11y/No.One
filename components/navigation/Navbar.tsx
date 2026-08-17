@@ -2,6 +2,7 @@ import Link from "next/link";
 import Container from "@/components/layout/Container";
 import NavLink from "@/components/navigation/NavLink";
 import MobileMenu from "@/components/navigation/MobileMenu";
+import ThemeToggle from "@/components/navigation/ThemeToggle";
 import { NAV_ITEMS } from "@/config/site";
 
 /**
@@ -17,16 +18,17 @@ export default function Navbar() {
           <Link href="/" className="text-body font-semibold text-foreground">
             No.One
           </Link>
-
-          <nav className="hidden items-center gap-8 md:flex">
-            {NAV_ITEMS.map((item) => (
-              <NavLink key={item.href} href={item.href}>
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
-
-          <MobileMenu />
+          <div className="flex items-center gap-2">
+            <nav className="hidden items-center gap-8 md:flex">
+              {NAV_ITEMS.map((item) => (
+                <NavLink key={item.href} href={item.href}>
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+            <ThemeToggle />
+            <MobileMenu />
+          </div>
         </div>
       </Container>
     </header>

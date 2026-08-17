@@ -12,12 +12,12 @@
 
   --card: #09090b;
 
-  /* Accent — single brand accent used sparingly for links, focus states,
+  /* Accent - single brand accent used sparingly for links, focus states,
      and primary actions. Swap this one value to re-theme the whole site. */
   --accent: #3b82f6;
   --accent-foreground: #ffffff;
 
-  /* Semantic state colors — for future form validation, alerts, and
+  /* Semantic state colors - for future form validation, alerts, and
      feedback components (components/feedback, components/forms). */
   --success: #22c55e;
   --success-foreground: #ffffff;
@@ -28,7 +28,7 @@
   --danger: #ef4444;
   --danger-foreground: #ffffff;
 
-  /* Focus ring — defaults to the accent so keyboard focus is always
+  /* Focus ring - defaults to the accent so keyboard focus is always
      visible without every component re-declaring a color. */
   --ring: var(--accent);
 
@@ -40,6 +40,44 @@
 
   /* Animation */
   --transition: 200ms ease;
+
+  /* Shadow scale - dark-mode values, tuned for a pure-black surface:
+     elevation reads via a faint white hairline plus a soft black
+     falloff, since a normal light-mode drop shadow is invisible on
+     #000. These are :root custom properties (not hardcoded directly
+     in @theme) specifically so the .light block below can override
+     them at runtime - @theme inline's shadow utilities reference these
+     via var(), the same indirection pattern already used for colors,
+     so a theme class swap actually retheme's shadows instead of
+     silently leaving dark-tuned shadows active in light mode. */
+  --shadow-sm-value: 0 1px 2px 0 rgb(0 0 0 / 0.6);
+  --shadow-md-value: 0 8px 24px -8px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.04);
+  --shadow-lg-value: 0 24px 48px -12px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
+}
+
+/* Light theme - applied via a `.light` class on <html>, toggled by
+   next-themes (ThemeToggle.tsx / app/layout.tsx). Every color and
+   shadow token gets a light-appropriate value; radius, z-index,
+   typography, and layout tokens are theme-independent and stay in
+   :root untouched. Accent/success/warning/danger/ring are left
+   unchanged deliberately - they're self-contained fill+foreground
+   pairs already tested against both black and white in practice
+   (blue-500 and friends read fine on both), so changing them adds
+   risk without a clear payoff. Revisit if contrast issues turn up. */
+.light {
+  --background: #ffffff;
+  --foreground: #09090b;
+
+  --muted: #52525b;
+  --muted-foreground: #52525b;
+
+  --border: #e4e4e7;
+
+  --card: #f4f4f5;
+
+  --shadow-sm-value: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md-value: 0 8px 24px -8px rgb(0 0 0 / 0.12), 0 0 0 1px rgb(0 0 0 / 0.04);
+  --shadow-lg-value: 0 24px 48px -12px rgb(0 0 0 / 0.16), 0 0 0 1px rgb(0 0 0 / 0.06);
 }
 
 @theme inline {
@@ -49,7 +87,7 @@
 
   /* Type scale
      Every size ships with a matched line-height and letter-spacing
-     so `text-*` utilities are correct by default — no per-usage
+     so `text-*` utilities are correct by default - no per-usage
      leading/tracking guesswork across the app. */
   --text-display: 4.5rem;
   --text-display--line-height: 1.05;
@@ -95,12 +133,12 @@
   --text-caption--line-height: 1.4;
   --text-caption--letter-spacing: 0.08em;
 
-  /* Layout — aliases --max-width into Tailwind's container namespace so
+  /* Layout - aliases --max-width into Tailwind's container namespace so
      `max-w-content` is a real utility instead of a hardcoded max-w-7xl
      that happens to match the same number. */
   --container-content: var(--max-width);
 
-  /* Color aliases — expose the semantic palette as real Tailwind
+  /* Color aliases - expose the semantic palette as real Tailwind
      utilities (bg-background, text-muted, border-border, etc.)
      instead of hand-writing var(--x) everywhere. */
   --color-background: var(--background);
@@ -119,22 +157,24 @@
   --color-danger-foreground: var(--danger-foreground);
   --color-ring: var(--ring);
 
-  /* Radius scale — `rounded-md` is the site default (14px), matching
-     the design system's single --radius value. */
+  /* Radius scale - `rounded-md` is the site default (14px), matching
+     the design system's single --radius value. Theme-independent. */
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-full: 9999px;
 
-  /* Shadow scale — tuned for a pure-black surface: elevation reads via
-     a faint white hairline plus a soft black falloff, since a normal
-     light-mode drop shadow is invisible on #000. */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.6);
-  --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.04);
-  --shadow-lg: 0 24px 48px -12px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
+  /* Shadow scale - now indirected through the :root/.light custom
+     properties above instead of hardcoded literal values, so theme
+     switching actually retheme's shadows instead of leaving dark-mode
+     values active regardless of class. */
+  --shadow-sm: var(--shadow-sm-value);
+  --shadow-md: var(--shadow-md-value);
+  --shadow-lg: var(--shadow-lg-value);
 
-  /* Z-index scale — single source of truth for stacking context,
-     for future dropdowns, modals, toasts, and tooltips. */
+  /* Z-index scale - single source of truth for stacking context,
+     for future dropdowns, modals, toasts, and tooltips.
+     Theme-independent. */
   --z-index-sticky: 40;
   --z-index-dropdown: 50;
   --z-index-overlay: 60;
@@ -145,7 +185,7 @@
 
 /* Wrapped in @layer base so these rules follow Tailwind's normal cascade
    priority (utilities > components > base) instead of silently winning
-   over every utility class regardless of specificity — unlayered CSS
+   over every utility class regardless of specificity - unlayered CSS
    always beats layered CSS in the cascade, which is what caused the
    Button "primary" variant's text to render invisible (a { color:
    inherit } was overriding text-background on the <Link>). */
@@ -167,6 +207,11 @@
 
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+
+    /* Smooth theme switching. Already covered by the reduced-motion
+       block below (transition-duration is zeroed globally for that
+       preference), so no separate guard needed here. */
+    transition: background-color var(--transition), color var(--transition);
   }
 
   a {
@@ -183,7 +228,7 @@
     max-width: 100%;
   }
 
-  /* Focus visibility — every interactive element gets a consistent,
+  /* Focus visibility - every interactive element gets a consistent,
      keyboard-only focus ring using the --ring token, instead of each
      future component (Button, Input, Nav link) redefining its own. */
   :focus-visible {
