@@ -20,15 +20,16 @@ Sprint 1
 
 Current Task
 
-P2-T04 /about page complete
+P3-T02 Search entry point complete
 
 Next Task
 
-TBD (/projects, /notes, or /contact)
+/notes page (Phase 5 content-platform work, first real content type
+beyond the four MVP pages)
 
 Overall Progress
 
-17 / 48 Tasks Complete
+21 / 48 Tasks Complete
 
 ---
 
@@ -524,4 +525,52 @@ Waiting
   anywhere, sparse copy) was raised and explicitly deferred until
   Notes/Startups exist to fill it out, rather than guessed at now.
   Revisit once more content-bearing pages exist.
+- Verified with tsc --noEmit and eslint (clean).
+
+## Completed: P3-T01 Light/Dark Theme Toggle
+
+- Added full light/dark switching via next-themes: ThemeToggle.tsx
+  (sun/moon button in Navbar, visible on both desktop and mobile),
+  ThemeProvider in layout.tsx (attribute=class, defaultTheme=system,
+  enableSystem so it respects OS preference by default), and a .light
+  class in globals.css overriding every color token.
+- Real architectural gap found and fixed: the shadow scale was
+  hardcoded directly inside @theme inline rather than indirected
+  through :root custom properties the way every color token already
+  is, so a class-based theme swap would have had zero effect on
+  shadows, silently leaving dark-tuned white-hairline shadows active
+  even in light mode. Renamed to --shadow-*-value in :root/.light and
+  referenced via var() from @theme inline, matching the existing
+  color-token indirection pattern.
+- Accent/success/warning/danger/ring left unchanged across themes
+  deliberately, self-contained fill+foreground pairs already read
+  fine on both backgrounds, changing them added risk without a clear
+  payoff.
+- ThemeToggle's mounted-guard effect hit the same
+  react-hooks/set-state-in-effect lint rule already documented in
+  P1-T07 and the VentureRow touch fix; used the same established fix,
+  wrap the setState call in a named function, call by reference.
+- Verified with tsc --noEmit and eslint (clean).
+
+---
+
+## Completed: P3-T02 Search Entry Point
+
+- Built components/navigation/SearchPalette.tsx: Cmd+K / Ctrl+K
+  command-palette overlay for jumping to existing pages
+  (Home/About/Projects/Notes/Contact). Client-side label filtering
+  only, not full content search, that is Module 10's job in
+  PROJECT_GRAPH.md, a separate later phase.
+- Deliberately reused the existing bg-background/80 backdrop-blur
+  treatment already established in Navbar rather than inventing new
+  overlay styling, and plain color/border tokens rather than a
+  bright generic command-palette highlight color.
+- Breadcrumbs (the third Phase 3 navigation gap) was deliberately
+  skipped: the site currently has zero nested routes; every page is
+  flat (/, /about, /projects, /contact). Breadcrumbs exist to
+  represent hierarchy that does not exist yet. Revisit once Notes or
+  Projects grow real detail pages with genuine nesting.
+- Keyboard: type to filter, Up/Down moves selection, Enter navigates,
+  Escape closes from anywhere. Body scroll locks while open, same
+  precedent as MobileMenu (P1-T10).
 - Verified with tsc --noEmit and eslint (clean).
