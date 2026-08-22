@@ -11,16 +11,11 @@ export default function MessageComposer() {
   const [message, setMessage] = useState("");
   const panelId = useId();
 
-  // PLACEHOLDER send behavior: opens a mailto: with the fields prefilled.
-  // This is intentionally not a real backend submission, no email
-  // service (Resend, Formspree, custom API route, etc.) has been chosen
-  // yet. Swap this handler once that decision is made; the UI/state
-  // above it doesn't need to change.
   function handleSend(e: React.FormEvent) {
     e.preventDefault();
     const subject = encodeURIComponent(`Message from ${name || "No.One visitor"}`);
     const body = encodeURIComponent(`${message}\n\nFrom: ${name} (${email})`);
-    window.location.href = `mailto:hello@example.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:vinayak00j@gmail.com?subject=${subject}&body=${body}`;
   }
 
   return (
@@ -34,7 +29,6 @@ export default function MessageComposer() {
       >
         {open ? "collapse" : "or write directly"}
       </button>
-
       <div
         id={panelId}
         className="grid overflow-hidden transition-[grid-template-rows] duration-300 ease-out"

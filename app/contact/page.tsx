@@ -1,36 +1,34 @@
 import ContactChannel, { type Channel } from "@/components/contact/ContactChannel";
 import MessageComposer from "@/components/contact/MessageComposer";
 
-// PLACEHOLDER data, real handles/hrefs need to come from the person,
-// not be guessed. Same rule as data/ventures.ts: don't fabricate facts.
 const channels: Channel[] = [
   {
     id: "email",
     name: "Email",
-    handle: "hello@example.com",
+    handle: "vinayak00j@gmail.com",
     blurb: "Best for anything that needs a real reply, not a quick reaction.",
-    href: "mailto:hello@example.com",
+    href: "mailto:vinayak00j@gmail.com",
   },
   {
-    id: "x",
-    name: "X",
-    handle: "@example",
+    id: "instagram",
+    name: "Instagram",
+    handle: "@_.vinayakjoshi._",
     blurb: "Where I think out loud in public, before it's a finished idea.",
-    href: "https://x.com/example",
+    href: "https://www.instagram.com/_.vinayakjoshi._/",
   },
   {
     id: "linkedin",
     name: "LinkedIn",
-    handle: "/in/example",
+    handle: "/in/vinayak-joshi-00v",
     blurb: "For anything that starts with a job, a role, or a collaboration.",
-    href: "https://linkedin.com/in/example",
+    href: "https://www.linkedin.com/in/vinayak-joshi-00v/",
   },
   {
     id: "github",
     name: "GitHub",
-    handle: "@example",
+    handle: "@vinayak7j-a11y",
     blurb: "The actual work, in progress and otherwise.",
-    href: "https://github.com/example",
+    href: "https://github.com/vinayak7j-a11y",
   },
 ];
 
@@ -50,13 +48,11 @@ export default function ContactPage() {
         No forms you have to fill out just to say hello. Pick whichever of
         these actually fits what you want to say.
       </p>
-
       <div>
         {channels.map((channel) => (
           <ContactChannel key={channel.id} channel={channel} />
         ))}
       </div>
-
       <MessageComposer />
     </main>
   );
