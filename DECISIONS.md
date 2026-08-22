@@ -383,3 +383,34 @@ Reason
 Judged sufficient at current scale, content/notes/ is currently
 empty. Revisit if content volume ever demands better incremental
 build performance.
+
+## ADR-020
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Added scroll and swipe driven page transitions across all routes via
+a new PageTransition wrapper in the root layout. Navigating past the
+top or bottom edge of any page triggers a spring animated route
+change in nav order, with a brief centered label naming the
+destination page and a dot rail indicating position in the sequence.
+Existing instant navigation, navbar links and the search palette,
+was kept fully intact alongside this, PageTransition only adds a
+new trigger path, it does not replace router.push based navigation.
+
+Reason
+
+Chose sequential AnimatePresence, mode wait, rather than true
+overlapping page transitions, which would require locking every
+route to a fixed viewport height so two pages could be positioned
+absolutely and stacked during the transition. That would have broken
+native scroll on long form Notes articles, the one part of the site
+built specifically for reading. The sequential approach keeps every
+page's natural, organic scroll height intact at the cost of a small
+gap between one page's exit finishing and the next page's entrance
+starting, judged an acceptable trade for not compromising Notes.
+Respects the existing useReducedMotion hook, falling back to an
+instant swap with no animation when that is set.
