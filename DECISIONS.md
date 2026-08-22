@@ -281,3 +281,105 @@ sticky-footer fix is for the outermost flex container spanning
 Navbar/main/Footer to own the `min-h-screen`, with the middle section
 taking `flex-1` to absorb exactly the remaining space — so that's now
 `<body>`'s job, not `PageLayout`'s.
+
+## ADR-015
+
+Date
+
+FILL IN DATE
+
+Decision
+
+cn()'s extendTailwindMerge config now declares an explicit font-size
+class group listing all ten custom typography classes (text-display,
+text-h1 through text-caption).
+
+Reason
+
+twMerge has no awareness of classes defined via Tailwind v4's
+@theme inline unless told about them. Its stock font-size group only
+recognizes standard values like text-sm/text-lg, so it failed to
+classify text-body as a font-size utility; its looser color-group
+matching then classified text-body into the same conflict group as
+text-background. Since cva applies the size variant after the
+variant variant, twMerge's last-wins resolution silently dropped
+text-background, causing Button's primary variant to render
+invisible white-on-white text whenever paired with a size variant.
+This is a distinct bug from ADR-012's cascade-layer issue, found
+later during Contact page work. Fix is sitewide since cn() backs
+every components/ui primitive.
+
+## ADR-016
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Shadow tokens moved from being hardcoded directly in @theme inline
+to custom properties in :root/.light using the same naming prefix
+as the color tokens, referenced via var(), matching the existing
+color-token indirection pattern.
+
+Reason
+
+Found while building the theme toggle: a class-based theme swap has
+no effect on values baked directly into @theme inline, which would
+have silently left dark-tuned shadows active in light mode.
+Accent/success/warning/danger/ring were deliberately left unchanged
+across themes since they already read fine as self-contained
+fill/foreground pairs on both backgrounds.
+
+## ADR-017
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Use next-themes for light/dark switching rather than a hand-rolled
+implementation.
+
+Reason
+
+Avoids flash-of-wrong-theme on load, which is easy to get wrong by
+hand. attribute="class", defaultTheme="system", enableSystem respects
+OS preference by default.
+
+## ADR-018
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Notes MDX typography is a hand-rolled .prose-notes class in
+globals.css, built from the site's own design tokens, not
+@tailwindcss/typography's prose/prose-invert classes.
+
+Reason
+
+@tailwindcss/typography ships its own hardcoded gray scale, which
+would introduce a second, inconsistent color system alongside the
+existing :root/.light token system.
+
+## ADR-019
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Notes content layer uses next-mdx-remote/rsc plus gray-matter plus a
+simple filesystem read of content/notes/*.mdx, rather than a
+build-time content plugin such as Contentlayer or Velite.
+
+Reason
+
+Judged sufficient at current scale, content/notes/ is currently
+empty. Revisit if content volume ever demands better incremental
+build performance.
