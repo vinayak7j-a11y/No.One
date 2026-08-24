@@ -414,3 +414,28 @@ gap between one page's exit finishing and the next page's entrance
 starting, judged an acceptable trade for not compromising Notes.
 Respects the existing useReducedMotion hook, falling back to an
 instant swap with no animation when that is set.
+
+## ADR-021
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Split the former single Contact page into two, Connect at /connect for
+public platforms, currently Instagram, LinkedIn, GitHub, and Contact
+at /contact for direct personal reach, email, and eventually WhatsApp
+and a personal Instagram distinct from the public one. NAV_ITEMS in
+config/site.ts updated to include both, which also updates
+PAGE_ORDER for the scroll and swipe page transitions automatically
+since both read from the same source.
+
+Reason
+
+The original single Contact page conflated two different visitor
+intents, seeing public work and content versus actually reaching the
+person directly, with no way to tell which channel served which
+purpose. Splitting them makes that distinction explicit rather than
+leaving a visitor to guess from an undifferentiated list of four
+unlabeled channels.
