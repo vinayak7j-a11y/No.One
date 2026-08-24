@@ -5,10 +5,6 @@ import type { Venture } from "@/data/ventures";
 
 interface VentureRowProps {
   venture: Venture;
-  /**
-   * Small deterministic offset (0–2) used to break the rigid list-row read.
-   * Not a ranking signal — purely spatial, has no bearing on status or order.
-   */
   stagger: 0 | 1 | 2;
 }
 
@@ -19,12 +15,6 @@ const STAGGER_CLASS: Record<0 | 1 | 2, string> = {
 };
 
 export default function VentureRow({ venture, stagger }: VentureRowProps) {
-  // Three independent sources of attention, kept separate on purpose.
-  // Merging hover/focus into one flag caused a real bug: on touch, a tap
-  // both focuses the button and sets `pinned`, and since focus doesn't
-  // clear on a second tap of the same element, a merged flag stayed
-  // stuck "active" even after `pinned` toggled off. Keeping them apart
-  // means each device's interaction fully resets on its own terms.
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [pinned, setPinned] = useState(false);
@@ -53,7 +43,6 @@ export default function VentureRow({ venture, stagger }: VentureRowProps) {
       onPointerEnter={(e) => e.pointerType === "mouse" && setHovered(true)}
       onPointerLeave={(e) => e.pointerType === "mouse" && setHovered(false)}
     >
-      {/* Pointer-attention glow — decorative only, never required for function */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -73,10 +62,6 @@ export default function VentureRow({ venture, stagger }: VentureRowProps) {
         }}
         onClick={(e) => {
           setPinned((p) => !p);
-          // Only touch taps risk the stuck-focus problem described above —
-          // a keyboard-triggered click has no preceding pointerdown, so
-          // this never fires for keyboard users and their focus ring is
-          // left untouched.
           if (lastPointerTypeRef.current === "touch") {
             e.currentTarget.blur();
           }
@@ -108,6 +93,30 @@ export default function VentureRow({ venture, stagger }: VentureRowProps) {
             <p className="text-sm leading-relaxed text-muted-foreground/90">
               {venture.content.description}
             </p>
+            {(venture.content.link || venture.content.instagram) && (
+              <div className="mt-3 flex gap-4">
+                {venture.content.link && (
+                  <a
+                    href={venture.content.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs uppercase tracking-widest text-muted-foreground underline decoration-foreground/20 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground/60"
+                  >
+                    Live
+                  </a>
+                )}
+                {venture.content.instagram && (
+                  <a
+                    href={venture.content.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs uppercase tracking-widest text-muted-foreground underline decoration-foreground/20 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground/60"
+                  >
+                    Instagram
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

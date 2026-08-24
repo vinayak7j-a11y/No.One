@@ -37,6 +37,7 @@ export interface Venture {
   content: {
     description: string;
     link?: string;
+    instagram?: string;
   };
   relations?: VentureRelation[];
 }
