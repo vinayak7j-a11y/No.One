@@ -439,3 +439,26 @@ person directly, with no way to tell which channel served which
 purpose. Splitting them makes that distinction explicit rather than
 leaving a visitor to guess from an undifferentiated list of four
 unlabeled channels.
+
+## ADR-022
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Every page's content, About, Projects, Notes, Connect, Contact, now
+wraps its heading, intro paragraph, and list in a single div with
+mx-auto max-w-3xl, rather than leaving heading and paragraph with
+their own independent max-w classes and no centering of their own.
+
+Reason
+
+Content appeared pinned to the left edge on wide viewports despite
+Container itself being correctly centered. Root cause was that block
+elements with only a max-width class and no margin auto sit flush
+against whatever edge their parent starts at, they do not center
+themselves. Wrapping the whole content group in one centered column
+makes heading, paragraph, and list share the same edges and move as
+one visually coherent block instead of independently.

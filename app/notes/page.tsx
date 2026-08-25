@@ -1,44 +1,68 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import PageLayout from "@/components/layout/PageLayout";
+import Section from "@/components/layout/Section";
+import Heading from "@/components/ui/Heading";
+import Text from "@/components/ui/Text";
 import { getAllNotes } from "@/lib/notes";
+
+export const metadata: Metadata = {
+  title: "Notes",
+  description: "Vinayak Joshi, things learned.",
+};
 
 export default function NotesPage() {
   const notes = getAllNotes();
 
   return (
-    <main className="mx-auto max-w-4xl px-6 pb-32 pt-20 md:pt-28">
-      <p className="mb-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
-        Notes
-      </p>
-      <h1
-        className="mb-8 font-semibold tracking-tight"
-        style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)" }}
-      >
-        Things learned.
-      </h1>
+    <PageLayout>
+      <Section spacing="lg">
+        <div className="mx-auto max-w-3xl">
+          <Text as="p" size="caption" tone="subtle">
+            Notes
+          </Text>
 
-      {notes.length === 0 ? (
-        <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
-          Nothing here yet. When there&apos;s something worth writing
-          down, it&apos;ll show up here.
-        </p>
-      ) : (
-        <div>
-          {notes.map((note) => (
-            <Link
-              key={note.slug}
-              href={`/notes/${note.slug}`}
-              className="block border-b border-foreground/[0.06] py-6"
-            >
-              <span className="block font-semibold tracking-tight text-foreground">
-                {note.title}
-              </span>
-              <span className="mt-1 block text-sm text-muted-foreground">
-                {note.excerpt}
-              </span>
-            </Link>
-          ))}
+          <Heading as="h1" size="h1" className="mt-4">
+            Things learned.
+          </Heading>
+
+          {notes.length === 0 ? (
+            <div className="mt-10 flex flex-col gap-3">
+              <Text size="lg" tone="muted">
+                Nothing written yet. This is where it lives once there is
+                something worth writing down, not before.
+              </Text>
+              <Text size="caption" tone="subtle">
+                In the meantime,{" "}
+                <Link
+                  href="/projects"
+                  className="underline decoration-foreground/20 underline-offset-4 transition-colors hover:decoration-foreground/60"
+                >
+                  see what is actually being built
+                </Link>
+                .
+              </Text>
+            </div>
+          ) : (
+            <div className="mt-16">
+              {notes.map((note) => (
+                <Link
+                  key={note.slug}
+                  href={`/notes/${note.slug}`}
+                  className="block border-b border-foreground/[0.06] py-6"
+                >
+                  <span className="block font-semibold tracking-tight text-foreground">
+                    {note.title}
+                  </span>
+                  <span className="mt-1 block text-sm text-muted-foreground">
+                    {note.excerpt}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
-      )}
-    </main>
+      </Section>
+    </PageLayout>
   );
 }

@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import PageLayout from "@/components/layout/PageLayout";
+import Section from "@/components/layout/Section";
+import Heading from "@/components/ui/Heading";
+import Text from "@/components/ui/Text";
 import ContactChannel, { type Channel } from "@/components/contact/ContactChannel";
 
 export const metadata: Metadata = {
@@ -32,26 +36,29 @@ const channels: Channel[] = [
 
 export default function ConnectPage() {
   return (
-    <main className="mx-auto max-w-4xl px-6 pb-32 pt-20 md:pt-28">
-      <p className="mb-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
-        Connect
-      </p>
-      <h1
-        className="mb-8 font-semibold tracking-tight"
-        style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)" }}
-      >
-        Where I show up.
-      </h1>
-      <p className="mb-16 max-w-xl text-base leading-relaxed text-muted-foreground">
-        The public record, what I&apos;m building, sharing, and shipping.
-        For actually reaching me, that&apos;s a different page.
-      </p>
+    <PageLayout>
+      <Section spacing="lg">
+        <div className="mx-auto max-w-3xl">
+          <Text as="p" size="caption" tone="subtle">
+            Connect
+          </Text>
 
-      <div>
-        {channels.map((channel) => (
-          <ContactChannel key={channel.id} channel={channel} />
-        ))}
-      </div>
-    </main>
+          <Heading as="h1" size="h1" className="mt-4">
+            Where I show up.
+          </Heading>
+
+          <Text size="lg" tone="muted" className="mt-10">
+            The public record, what I&apos;m building, sharing, and shipping.
+            For actually reaching me, that&apos;s a different page.
+          </Text>
+
+          <div className="mt-16">
+            {channels.map((channel) => (
+              <ContactChannel key={channel.id} channel={channel} />
+            ))}
+          </div>
+        </div>
+      </Section>
+    </PageLayout>
   );
 }
