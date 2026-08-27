@@ -106,6 +106,10 @@ export default function PageTransition({
   useEffect(() => {
     function handleWheel(e: WheelEvent) {
       if (isTransitioningRef.current) return;
+      // MobileMenu and SearchPalette both lock body scroll this way
+      // while open. Reusing that same flag here means a wheel scroll
+      // over an open overlay can't trigger a navigation underneath it.
+      if (document.body.style.overflow === "hidden") return;
       if (e.deltaY > WHEEL_THRESHOLD && atBottom()) {
         navigate(1);
       } else if (e.deltaY < -WHEEL_THRESHOLD && atTop()) {
@@ -123,6 +127,7 @@ export default function PageTransition({
 
     function handleTouchEnd(e: TouchEvent) {
       if (isTransitioningRef.current || !touchStartRef.current) return;
+      if (document.body.style.overflow === "hidden") return;
       const endY = e.changedTouches[0].clientY;
       const delta = touchStartRef.current.y - endY;
 

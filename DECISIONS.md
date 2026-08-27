@@ -462,3 +462,26 @@ against whatever edge their parent starts at, they do not center
 themselves. Wrapping the whole content group in one centered column
 makes heading, paragraph, and list share the same edges and move as
 one visually coherent block instead of independently.
+
+## ADR-023
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Added data-scroll-behavior="smooth" to the html element in
+app/layout.tsx. Also made PageTransition's wheel and touch handlers
+bail out early when document.body.style.overflow is "hidden".
+
+Reason
+
+Next.js was logging a warning on every route change about
+scroll-behavior: smooth conflicting with its own scroll restoration
+during transitions, the documented fix is this one attribute.
+Separately, MobileMenu and SearchPalette both lock body scroll via
+that same style property while open, but PageTransition's scroll and
+swipe listeners never checked for it, so scrolling over either open
+overlay could trigger a page navigation underneath it. Reusing the
+existing lock flag closes that gap without new state or plumbing.

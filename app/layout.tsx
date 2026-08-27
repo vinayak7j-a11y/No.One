@@ -49,7 +49,7 @@ export default function RootLayout({
     // render intentionally differ on this one attribute. Without this,
     // React would (correctly, but unhelpfully here) warn about a
     // hydration mismatch on every page load.
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground flex min-h-screen flex-col`}
       >
