@@ -1,5 +1,9 @@
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import PageLayout from "@/components/layout/PageLayout";
+import Section from "@/components/layout/Section";
+import Heading from "@/components/ui/Heading";
+import Text from "@/components/ui/Text";
 import { getAllNotes, getNoteBySlug } from "@/lib/notes";
 
 interface NotePageProps {
@@ -24,23 +28,26 @@ export default async function NotePage({ params }: NotePageProps) {
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-6 pb-32 pt-20 md:pt-28">
-      <p className="mb-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
-        {new Date(note.date).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
-      </p>
-      <h1
-        className="mb-10 font-semibold tracking-tight"
-        style={{ fontSize: "clamp(2rem, 5vw, 3rem)" }}
-      >
-        {note.title}
-      </h1>
-      <div className="prose-notes text-body leading-relaxed text-foreground">
-        <MDXRemote source={note.content} />
-      </div>
-    </main>
+    <PageLayout>
+      <Section spacing="lg">
+        <div className="mx-auto max-w-3xl">
+          <Text as="p" size="caption" tone="subtle">
+            {new Date(note.date).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </Text>
+
+          <Heading as="h1" size="h1" className="mt-4">
+            {note.title}
+          </Heading>
+
+          <div className="prose-notes mt-10 text-body leading-relaxed text-foreground">
+            <MDXRemote source={note.content} />
+          </div>
+        </div>
+      </Section>
+    </PageLayout>
   );
 }

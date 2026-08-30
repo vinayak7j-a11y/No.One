@@ -18,7 +18,13 @@ interface NavLinkProps {
  */
 export default function NavLink({ href, children, className, onClick }: NavLinkProps) {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  // Exact match for most routes, but also treat a nested route as
+  // active for its parent, e.g. reading /notes/some-slug should still
+  // highlight the Notes nav item. Root "/" is excluded from the
+  // startsWith check since every path starts with "/".
+  const isActive =
+    pathname === href ||
+    (href !== "/" && pathname.startsWith(href + "/"));
 
   return (
     <Link

@@ -485,3 +485,33 @@ that same style property while open, but PageTransition's scroll and
 swipe listeners never checked for it, so scrolling over either open
 overlay could trigger a page navigation underneath it. Reusing the
 existing lock flag closes that gap without new state or plumbing.
+
+## ADR-024
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Three fixes from a manual audit pass. NavLink now treats a nested
+route as active for its parent nav item, so reading /notes/some-slug
+still highlights Notes, not just an exact pathname match. Button's
+native button branch now defaults to type="button" rather than
+leaving type unset. The Notes detail page,
+app/notes/[slug]/page.tsx, was migrated onto the same
+PageLayout/Section/Container chain every other page now uses, it had
+previously kept its own raw main markup with a different max-width
+and no responsive padding scale.
+
+Reason
+
+NavLink's exact match left the nav looking unhighlighted while deep
+in Notes content, a real navigation clarity gap. An unset button type
+defaults to submit inside a form per the HTML spec, nothing broke yet
+since current usages either sit outside forms or already set
+type explicitly, but it was a real latent bug waiting for the next
+form a Button gets added to. The Notes detail page migration was
+purely for consistency, content/notes is still empty so there was
+nothing to visually verify yet, worth revisiting once a real note
+exists.
