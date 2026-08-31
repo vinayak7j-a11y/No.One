@@ -19,6 +19,13 @@ const channels: Channel[] = [
     blurb: "Best for anything that needs a real reply, not a quick reaction.",
     href: "mailto:vinayak00j@gmail.com",
   },
+  {
+    id: "whatsapp",
+    name: "WhatsApp",
+    handle: "+91 92852 73124",
+    blurb: "For quick back and forth, if a longer email feels like overkill.",
+    href: "https://wa.me/919285273124",
+  },
 ];
 
 export default function ContactPage() {
