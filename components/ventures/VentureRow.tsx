@@ -93,7 +93,7 @@ export default function VentureRow({ venture, stagger }: VentureRowProps) {
             <p className="text-sm leading-relaxed text-muted-foreground/90">
               {venture.content.description}
             </p>
-            {(venture.content.link || venture.content.instagram) && (
+            {(venture.content.link || venture.content.github || venture.content.instagram) && (
               <div className="mt-3 flex gap-4">
                 {venture.content.link && (
                   <a
@@ -103,6 +103,16 @@ export default function VentureRow({ venture, stagger }: VentureRowProps) {
                     className="font-mono text-xs uppercase tracking-widest text-muted-foreground underline decoration-foreground/20 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground/60"
                   >
                     Live
+                  </a>
+                )}
+                {venture.content.github && (
+                  <a
+                    href={venture.content.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs uppercase tracking-widest text-muted-foreground underline decoration-foreground/20 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground/60"
+                  >
+                    Code
                   </a>
                 )}
                 {venture.content.instagram && (

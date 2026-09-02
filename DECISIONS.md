@@ -515,3 +515,23 @@ form a Button gets added to. The Notes detail page migration was
 purely for consistency, content/notes is still empty so there was
 nothing to visually verify yet, worth revisiting once a real note
 exists.
+
+## ADR-025
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Added an optional github field to Venture.content alongside the
+existing link and instagram fields, rendered in VentureRow as a
+third "Code" link next to "Live" and "Instagram" when present.
+
+Reason
+
+Ventures with a shipped live product or public repo had no way to
+actually link to either from the Projects page. All three fields
+stay optional and only render when filled in, consistent with the
+existing no-fabrication rule, none of the current five ventures have
+real URLs yet.
