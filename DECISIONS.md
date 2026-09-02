@@ -605,3 +605,24 @@ could actually reach the destination. For ventures with a real
 shipped product, that extra step added friction for no benefit,
 direct navigation on click is the expected behavior once a venture
 has somewhere real to send someone.
+
+## ADR-029
+
+Date
+
+FILL IN DATE
+
+Decision
+
+The redirect-on-click branch in VentureRow now blurs the button after
+calling window.open, for any input method, not only touch.
+
+Reason
+
+A mouse click focuses a button natively in most browsers. Since the
+redirect branch never toggled pinned, a lingering focus after the
+click kept active, and the revealed description, stuck true even
+after returning to this tab and moving the cursor away. The original
+touch-only blur was written for a different bug and did not cover
+this case, since it only fires when there is no link and pinned
+gets toggled instead.

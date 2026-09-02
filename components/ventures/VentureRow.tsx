@@ -68,13 +68,19 @@ export default function VentureRow({ venture, stagger }: VentureRowProps) {
           // pin-toggle behavior, since there's nowhere to send a click.
           if (venture.content.link) {
             window.open(venture.content.link, "_blank", "noopener,noreferrer");
+            // Blur regardless of input method here specifically: a
+            // mouse click focuses the button natively in most browsers,
+            // and since this branch never toggles pinned, a lingering
+            // focus would keep `active` (and the revealed description)
+            // stuck true even after returning to this tab later.
+            e.currentTarget.blur();
           } else {
             setPinned((p) => !p);
+            if (lastPointerTypeRef.current === "touch") {
+              e.currentTarget.blur();
+            }
           }
 
-          if (lastPointerTypeRef.current === "touch") {
-            e.currentTarget.blur();
-          }
           lastPointerTypeRef.current = null;
         }}
         onFocus={() => setFocused(true)}
