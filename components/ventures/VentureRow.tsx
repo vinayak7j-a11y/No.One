@@ -61,20 +61,17 @@ export default function VentureRow({ venture, stagger }: VentureRowProps) {
           lastPointerTypeRef.current = e.pointerType;
         }}
         onClick={(e) => {
-          // Mouse clicks and keyboard Enter navigate immediately, since
-          // those users already previewed the description via hover or
-          // focus before clicking. A touch tap only navigates on its
-          // second tap, the first tap reveals, matching how touch users
-          // have no hover preview and would otherwise never get to read
-          // anything before being redirected away.
-          const isFirstTouchTap =
-            lastPointerTypeRef.current === "touch" && !pinned;
-
-          if (venture.content.link && !isFirstTouchTap) {
+          // Hover (mouse) or focus (keyboard) already reveals the
+          // description independently of this handler. Any actual
+          // click or tap, when a live link exists, redirects straight
+          // to it. Ventures without a link fall back to the original
+          // pin-toggle behavior, since there's nowhere to send a click.
+          if (venture.content.link) {
             window.open(venture.content.link, "_blank", "noopener,noreferrer");
+          } else {
+            setPinned((p) => !p);
           }
 
-          setPinned((p) => !p);
           if (lastPointerTypeRef.current === "touch") {
             e.currentTarget.blur();
           }
