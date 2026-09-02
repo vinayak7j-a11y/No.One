@@ -535,3 +535,27 @@ actually link to either from the Projects page. All three fields
 stay optional and only render when filled in, consistent with the
 existing no-fabrication rule, none of the current five ventures have
 real URLs yet.
+
+## ADR-026
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Defined the Law of Relation in LANGUAGE.md, a connection between two
+artifacts is a fact about both of them, discoverable from either end,
+revealed under the same attention mechanics as the other artifacts,
+rendered at secondary visual weight, and never implying rank between
+the connected sides. Confirmed the Sequential, Evidentiary,
+Influential, and Collaborative family grouping for RelationType as
+intended. LANGUAGE.md's two remaining open items are resolved.
+
+Reason
+
+This was the last gap in the five laws, flagged as the top
+documentation risk across three prior handoffs and left unresolved
+twice. Closing it now means Startups and Journey, Phase 5 work that
+will actually create cross artifact relations, has a defined law to
+build against rather than inventing one under deadline pressure.

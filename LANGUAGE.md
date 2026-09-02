@@ -5,10 +5,10 @@ design. Written after the fact from what was actually built (Ventures,
 Contact) and the reasoning logged in TASK_GRAPH.md, not invented ahead
 of use.
 
-Two sections below are marked OPEN rather than filled in. Guessing at
-them would mean inventing design principles that were never actually
-decided, which is exactly the kind of fabrication this project's own
-rules (see data/ventures.ts's comments) exist to prevent.
+Everything below reflects decisions actually made, not principles
+guessed at ahead of use, which is exactly the kind of fabrication
+this project's own rules (see data/ventures.ts's comments) exist to
+prevent.
 
 ## The standing rejection test
 
@@ -54,12 +54,16 @@ in VentureRow.tsx.
 
 ### Law of Relation
 
-OPEN. Not defined in TASK_GRAPH.md's prose or in code comments. The
-RelationType vocabulary below exists in the data layer, but the law
-governing how relations should actually surface or behave visually
-has not been written down anywhere retrievable. Needs to be defined,
-ideally before Startups/Journey Phase 5 work starts creating cross
-artifact relations for real.
+A connection between two artifacts is a fact about both of them, not
+just the one that declares it. The data model stores a relation as
+one artifact pointing to another, VentureRelation lives on the
+source, but the rendered UI should make that connection discoverable
+from either end, not only the side that defined it. Relations reveal
+under the same attention mechanics as the Law of Attention, they are
+not shown at rest. When shown, a relation renders at secondary visual
+weight relative to the artifact's own identity and content, and never
+implies that either connected artifact outranks the other, consistent
+with the Law of Non-Ranking.
 
 ## Four part artifact anatomy
 
@@ -68,7 +72,7 @@ entries later, is shaped as three data fields, not four, because
 behavior is shared physics rather than per-artifact data:
 
 - identity: name, stage, status label
-- content: description, optional link
+- content: description, optional link, github, and instagram
 - relations: optional array of typed connections to other artifacts
 
 Behavior, how an artifact responds to attention, is not a field on
@@ -94,13 +98,12 @@ inspired_by
 influenced_by
 built_with
 
-### Proposed families, NOT confirmed, needs your sign off
+### Relationship families
 
 The type comment says these are organized into families, but the
 code does not label which type belongs to which family, and no other
 source does either. The grouping below is inferred from what the
-names plainly suggest, not sourced from anywhere. Please confirm or
-correct before treating this as settled:
+names plainly suggest, and has since been confirmed as intended:
 
 Sequential, time ordered progression: led_to, expanded_into,
 continues_as
@@ -115,7 +118,5 @@ Collaborative, shared construction: built_with
 
 ## Open items
 
-1. Define the Law of Relation.
-2. Confirm or correct the family grouping above.
-3. Once both are settled, populate real relations entries on actual
-   ventures, no invented connections until then.
+1. Populate real relations entries on actual ventures, no invented
+   connections until then.
