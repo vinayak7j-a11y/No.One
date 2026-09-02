@@ -66,42 +66,47 @@ export const ventures: Venture[] = [
     content: {
       description:
         "A loyalty and retention platform for local businesses, real rewards, digitized, built and tested with actual businesses instead of assumptions. Real usage first, everything else after.",
+      link: "https://keepl.onrender.com",
     },
   },
   {
     slug: "bond",
     identity: {
       name: "Bond",
-      stage: "concept",
-      statusLabel: "Concept",
+      stage: "active",
+      statusLabel: "Live",
     },
     content: {
       description:
         "A physical and digital identity product, share your professional self and online presence instantly, through a seamless interaction rather than a business card or a link. Still early, still research. The vision matters more than the how, right now.",
+      link: "https://bond-five-swart.vercel.app/",
     },
   },
   {
     slug: "messpass",
     identity: {
       name: "MessPass",
-      stage: "prototype",
-      statusLabel: "Prototype",
+      stage: "active",
+      statusLabel: "Live",
     },
     content: {
       description:
         "QR-based meal management for hostels, colleges, and mess providers, so tracking who ate what doesn't have to mean paper registers and guesswork. Attendance, verification, and meal tracking, simplified into one scan.",
+      link: "https://messpass-mocha.vercel.app/",
     },
   },
   {
-    slug: "levelup",
+    slug: "no-one",
     identity: {
-      name: "LevelUp",
+      name: "No.One",
       stage: "active",
-      statusLabel: "Active",
+      statusLabel: "Live",
     },
     content: {
       description:
-        "A growth studio, websites, AI, automation, and digital systems that help businesses actually show up online. Where I turn what I learn building my own ventures into results for someone else's.",
+        "The Digital Headquarters of Vinayak Joshi. This site itself, the living record of everything else here, built to grow for years without a rewrite rather than shipped once and left alone.",
+      link: "https://no-one-rho.vercel.app/",
+      github: "https://github.com/vinayak7j-a11y/No.One",
     },
   },
 ];

@@ -559,3 +559,26 @@ documentation risk across three prior handoffs and left unresolved
 twice. Closing it now means Startups and Journey, Phase 5 work that
 will actually create cross artifact relations, has a defined law to
 build against rather than inventing one under deadline pressure.
+
+## ADR-027
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Populated real live URLs for Keepl, MessPass, Bond, and No.One
+itself, marked all four active with a Live status label. Removed
+LevelUp from ventures entirely. Added No.One as a new venture entry,
+including its own GitHub repo link alongside its live URL.
+
+Reason
+
+These were the first real link and github field values entered since
+those fields were added earlier, previously every venture left them
+empty rather than fabricated. LevelUp was removed at the person's
+request rather than left stale. No.One being listed as one of its own
+ventures is intentional, the site documents itself as one of the
+things being built, consistent with the project's own stated identity
+as a living record rather than a finished portfolio.
