@@ -582,3 +582,26 @@ request rather than left stale. No.One being listed as one of its own
 ventures is intentional, the site documents itself as one of the
 things being built, consistent with the project's own stated identity
 as a living record rather than a finished portfolio.
+
+## ADR-028
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Clicking or tapping a venture's name now redirects straight to its
+live URL when one exists, opened in a new tab. Hover and keyboard
+focus still reveal the description independently of this, unchanged.
+Ventures without a link, currently Rent It, keep the original click
+to pin the description open.
+
+Reason
+
+Previously the live and code links only appeared inside the revealed
+description, requiring a hover or tap first before a second click
+could actually reach the destination. For ventures with a real
+shipped product, that extra step added friction for no benefit,
+direct navigation on click is the expected behavior once a venture
+has somewhere real to send someone.
