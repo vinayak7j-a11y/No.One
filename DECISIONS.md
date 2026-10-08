@@ -626,3 +626,34 @@ after returning to this tab and moving the cursor away. The original
 touch-only blur was written for a different bug and did not cover
 this case, since it only fires when there is no link and pinned
 gets toggled instead.
+
+## ADR-030
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Added a site-wide "living field": one fixed WebGL particle canvas
+(three, @react-three/fiber, @react-three/postprocessing) behind the
+whole site. Lazy-loaded on idle, client-only, off-switch in the footer
+(localStorage "noone:field"), full fallback to the plain site when
+WebGL is missing, reduced motion is set, or the visitor turns it off.
+
+Reason
+
+The field is native to the Laws, not decoration. It follows attention
+(a section or venture taking attention gives the field that shape and
+releases it afterwards: Return), every venture gets an equal particle
+share (Non-Ranking), and it recedes behind copy on inner pages (Rest).
+Text stays real DOM, so accessibility and SEO are unchanged.
+
+Architecture
+
+- lib/field/attention.ts is an external store of claims with
+  priorities (route 0, section 5, venture 10). Not React context, so
+  claims never re-render the tree.
+- lib/field/engine.ts is a plain class (no React) driving a GPU morph
+  shader between forms; the DOM wordmark is sampled from the real font.
+- Auto-degrade: no bloom, then DPR 1, then half the particles.

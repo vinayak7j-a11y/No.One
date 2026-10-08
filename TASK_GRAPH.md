@@ -574,3 +574,13 @@ Waiting
   Escape closes from anywhere. Body scroll locks while open, same
   precedent as MobileMenu (P1-T10).
 - Verified with tsc --noEmit and eslint (clean).
+
+## P4-T1: Living field (completed)
+
+- Site-wide WebGL particle field tied to attention, rest and return.
+- Cinematic home: wordmark formed from particles, scroll-driven sections
+  (seed, rest, galaxy, bridge), venture hover/focus morphs the field.
+- Shared VentureList used by home and /projects.
+- Footer on/off switch; reduced-motion and no-WebGL fallbacks.
+- Verified with tsc --noEmit, eslint (clean), next build --webpack, and
+  headless screenshots.

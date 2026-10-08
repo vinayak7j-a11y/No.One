@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
+import { useFieldClaim } from "@/hooks/useFieldClaim";
 import type { Venture } from "@/data/ventures";
 
 interface VentureRowProps {
@@ -24,6 +25,10 @@ export default function VentureRow({ venture, stagger }: VentureRowProps) {
   const detailsId = useId();
 
   const active = hovered || focused || pinned;
+
+  // The same attention that opens this row also asks the living field to
+  // take this venture's shape; losing attention releases it (Law of Return).
+  useFieldClaim(venture.identity.form, active, 10, 1);
 
   function handlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
     if (e.pointerType !== "mouse") return;

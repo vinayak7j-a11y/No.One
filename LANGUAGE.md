@@ -120,3 +120,10 @@ Collaborative, shared construction: built_with
 
 1. Populate real relations entries on actual ventures, no invented
    connections until then.
+
+## Living field
+
+The field is the Laws made visible: it follows attention (Attention),
+settles when nothing asks for it (Rest), returns to the page's form when
+attention leaves (Return), and gives every venture equal presence
+(Non-Ranking).
