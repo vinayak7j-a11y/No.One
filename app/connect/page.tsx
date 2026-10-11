@@ -32,6 +32,13 @@ const channels: Channel[] = [
     blurb: "The actual work, in progress and otherwise.",
     href: "https://github.com/vinayak7j-a11y",
   },
+  {
+    id: "resume",
+    name: "Resume",
+    handle: "PDF",
+    blurb: "The full history, roles, and shape of what I've worked on.",
+    href: "https://drive.google.com/file/d/1aCeE0vLL_NHrrshtlmYir7PPQN9VwpfR/view?usp=drivesdk",
+  },
 ];
 
 export default function ConnectPage() {
