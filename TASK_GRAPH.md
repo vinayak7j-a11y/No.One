@@ -602,3 +602,11 @@ Waiting
 - Performance pass (DPR, passes, reveals).
 - Verified with tsc, eslint, next build --webpack, and headless
   screenshots with the real Geist font (dark, light, mobile).
+
+## P4-T4: Dependency-free field renderer (completed)
+
+- Raw WebGL2 engine replacing three.js/R3F/postprocessing (~9 KB gz).
+- Idle throttling, hidden-tab pause, quality steps, graceful disable.
+- Scroll-driven gathering; ink heading; statement progress fix.
+- Verified with tsc, eslint, next build --webpack, headless screenshots
+  with the real Geist font.

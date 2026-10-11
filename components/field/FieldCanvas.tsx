@@ -1,42 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Bloom, EffectComposer } from "@react-three/postprocessing";
-import * as THREE from "three";
-import {
-  FIELD_CAMERA_Z,
-  FIELD_FORMS,
-  FIELD_FOV,
-  WORDMARK_UNITS,
-} from "@/config/field";
-import {
-  anchorFontKey,
-  getFieldAnchor,
-  subscribeFieldAnchor,
-} from "@/lib/field/anchor";
-import {
-  getFieldSnapshot,
-  pulseField,
-  subscribeField,
-} from "@/lib/field/attention";
+import { FIELD_CAMERA_Z, FIELD_FORMS, FIELD_FOV, WORDMARK_UNITS } from "@/config/field";
+import { anchorFontKey, getFieldAnchor, subscribeFieldAnchor } from "@/lib/field/anchor";
+import { getFieldAssemble } from "@/lib/field/assemble";
+import { getFieldSnapshot, pulseField, subscribeField } from "@/lib/field/attention";
 import { FieldEngine } from "@/lib/field/engine";
 import { sampleWordmark } from "@/lib/field/wordmark";
 
 interface FieldCanvasProps {
   theme: "dark" | "light";
   reduced: boolean;
-  /** Phones and tablets: fewer particles, no bloom. */
+  /** Phones and tablets: fewer particles. */
   coarse: boolean;
 }
 
-interface SceneProps extends FieldCanvasProps {
-  level: number;
-  onDegrade: (level: number) => void;
-}
-
-const HALF_HEIGHT = Math.tan(THREE.MathUtils.degToRad(FIELD_FOV / 2)) * FIELD_CAMERA_Z;
+const HALF_HEIGHT = Math.tan((FIELD_FOV / 2) * (Math.PI / 180)) * FIELD_CAMERA_Z;
+const IDLE_FRAME_MS = 1000 / 30;
 
 function readBackground(theme: "dark" | "light") {
   const value = getComputedStyle(document.documentElement)
@@ -45,29 +26,45 @@ function readBackground(theme: "dark" | "light") {
   return value || (theme === "dark" ? "#000000" : "#ffffff");
 }
 
-function Scene({ theme, reduced, coarse, level, onDegrade }: SceneProps) {
-  const getState = useThree((s) => s.get);
-  const invalidate = useThree((s) => s.invalidate);
+function smoothstep(a: number, b: number, x: number) {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+}
+
+/**
+ * Owns the canvas and the frame loop for the living field. It is
+ * deliberately thin: all the drawing is in lib/field/engine.ts.
+ *
+ * Frame budget rules:
+ *  - nothing renders while the tab is hidden
+ *  - when the field has settled and nobody is moving the pointer or
+ *    scrolling, it idles at 30 fps
+ *  - reduced motion renders only when something actually changes
+ *  - if frames stay slow it steps down: pixel ratio first, then particles
+ */
+export default function FieldCanvas({ theme, reduced, coarse }: FieldCanvasProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const pathname = usePathname();
 
   const engineRef = useRef<FieldEngine | null>(null);
-  const pointer = useRef({ x: 0, y: 0, active: false });
-  const isHome = useRef(pathname === "/");
-  const reducedRef = useRef(reduced);
-  const stats = useRef({ fps: 60, slow: 0, level: 0, ready: false });
   const themeRef = useRef(theme);
+  const reducedRef = useRef(reduced);
+  const homeRef = useRef(pathname === "/");
+  const requestRef = useRef<() => void>(() => {});
 
-  // Latest props, readable from callbacks without re-subscribing.
   useEffect(() => {
-    isHome.current = pathname === "/";
-    reducedRef.current = reduced;
-    invalidate();
-  }, [pathname, reduced, invalidate]);
+    homeRef.current = pathname === "/";
+    requestRef.current();
+  }, [pathname]);
 
-  // Publish the current form's accent hue as a CSS variable so the page
-  // (glow, progress bar, caption) can follow what the field is showing.
+  useEffect(() => {
+    reducedRef.current = reduced;
+    requestRef.current();
+  }, [reduced]);
+
   useEffect(() => {
     themeRef.current = theme;
+    engineRef.current?.setTheme(theme, readBackground(theme));
     const form = document.documentElement.dataset.fieldForm;
     if (form && form in FIELD_FORMS) {
       document.documentElement.style.setProperty(
@@ -75,24 +72,35 @@ function Scene({ theme, reduced, coarse, level, onDegrade }: SceneProps) {
         FIELD_FORMS[form as keyof typeof FIELD_FORMS][theme][1],
       );
     }
+    requestRef.current();
   }, [theme]);
 
-  // Create the engine once per particle budget and wire it to the store.
   useEffect(() => {
-    const scene = getState().scene;
-    const engine = new FieldEngine(coarse ? 16000 : 36000);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let engine: FieldEngine;
+    try {
+      engine = new FieldEngine(canvas, coarse ? 16000 : 36000);
+    } catch (error) {
+      // No WebGL2 (or a driver refusing a shader): leave the plain site
+      // exactly as it was, and say why in the console.
+      console.warn("[field] disabled:", error);
+      return;
+    }
     engineRef.current = engine;
-    scene.add(engine.group);
-    scene.background = engine.background;
-    engine.setTheme(theme, readBackground(theme));
+    const root = document.documentElement;
+
+    engine.setTheme(themeRef.current, readBackground(themeRef.current));
     if (!reducedRef.current) engine.intro();
 
+    // --- Attention store -> engine ----------------------------------------
     let lastPulse = getFieldSnapshot().pulseSeq;
-    function apply() {
+    function applySnapshot() {
       const snap = getFieldSnapshot();
       engine.setTarget(snap.form, snap.side, reducedRef.current);
-      document.documentElement.dataset.fieldForm = snap.form;
-      document.documentElement.style.setProperty(
+      root.dataset.fieldForm = snap.form;
+      root.style.setProperty(
         "--field-accent",
         FIELD_FORMS[snap.form][themeRef.current][1],
       );
@@ -100,53 +108,24 @@ function Scene({ theme, reduced, coarse, level, onDegrade }: SceneProps) {
         lastPulse = snap.pulseSeq;
         if (!reducedRef.current) engine.pulse(snap.pulseStrength);
       }
-      invalidate();
+      requestRef.current();
     }
-    apply();
-    const unsubscribe = subscribeField(apply);
+    applySnapshot();
+    const unsubscribeField = subscribeField(applySnapshot);
 
-    return () => {
-      unsubscribe();
-      scene.remove(engine.group);
-      scene.background = null;
-      engine.dispose();
-      engineRef.current = null;
-      delete document.documentElement.dataset.field;
-      delete document.documentElement.dataset.fieldForm;
-      document.documentElement.style.removeProperty("--field-accent");
-    };
-    // `theme` is applied by its own effect below; re-creating the engine
-    // on a theme change would throw away the current form.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getState, coarse, invalidate]);
-
-  useEffect(() => {
-    engineRef.current?.setTheme(theme, readBackground(theme));
-    invalidate();
-  }, [theme, invalidate]);
-
-  useEffect(() => {
-    engineRef.current?.setDrawFraction(level >= 3 ? 0.5 : 1);
-  }, [level]);
-
-  // Sample the wordmark in the heading's own font and tracking, and again
-  // whenever that typography changes (for example after a route change).
-  useEffect(() => {
+    // --- Wordmark, in the heading's own typography -------------------------
     let cancelled = false;
     let lastKey = "";
-
     async function sample() {
       await document.fonts.ready;
-      const engine = engineRef.current;
-      if (cancelled || !engine) return;
+      if (cancelled) return;
       const anchor = getFieldAnchor();
       const key = anchorFontKey(anchor);
       if (key === lastKey) return;
       const positions = sampleWordmark({
         text: "No.One",
         count: engine.count,
-        fontFamily:
-          anchor?.font.family ?? getComputedStyle(document.body).fontFamily,
+        fontFamily: anchor?.font.family ?? getComputedStyle(document.body).fontFamily,
         weight: anchor?.font.weight ?? 600,
         letterSpacingEm: anchor?.font.letterSpacingEm ?? 0,
         units: WORDMARK_UNITS,
@@ -154,130 +133,178 @@ function Scene({ theme, reduced, coarse, level, onDegrade }: SceneProps) {
       if (positions && !cancelled) {
         lastKey = key;
         engine.setWordmark(positions);
-        invalidate();
+        requestRef.current();
       }
     }
-
     void sample();
-    const unsubscribe = subscribeFieldAnchor(() => void sample());
-    return () => {
-      cancelled = true;
-      unsubscribe();
-    };
-  }, [coarse, invalidate]);
+    const unsubscribeAnchor = subscribeFieldAnchor(() => void sample());
 
-  // Pointer, and click-to-burst on anything that is not a control.
-  useEffect(() => {
+    // --- Pointer, scroll, size -------------------------------------------
+    const pointer = { x: 0, y: 0, active: false };
+    let lastInput = performance.now();
+    const touch = () => {
+      lastInput = performance.now();
+      requestRef.current();
+    };
+
     function onMove(e: PointerEvent) {
-      pointer.current.x = (e.clientX / window.innerWidth) * 2 - 1;
-      pointer.current.y = -((e.clientY / window.innerHeight) * 2 - 1);
-      pointer.current.active = true;
+      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -((e.clientY / window.innerHeight) * 2 - 1);
+      pointer.active = true;
+      touch();
     }
     function onLeave() {
-      pointer.current.active = false;
+      pointer.active = false;
+      touch();
     }
     function onDown(e: PointerEvent) {
       const target = e.target as Element | null;
-      if (target?.closest?.("a, button, input, textarea, select, [role='button']")) {
-        return;
-      }
+      if (target?.closest?.("a, button, input, textarea, select, [role='button']")) return;
       pulseField(0.8);
     }
     function onUp(e: PointerEvent) {
       if (e.pointerType !== "mouse") onLeave();
     }
+
+    // Quality steps: 0 full, 1 pixel ratio 1, 2 also 60% of the particles.
+    let level = 0;
+    let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    let cssW = window.innerWidth;
+    let cssH = window.innerHeight;
+    function resize() {
+      cssW = window.innerWidth;
+      cssH = window.innerHeight;
+      dpr = level >= 1 ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+      engine.resize(cssW, cssH, dpr);
+      touch();
+    }
+    resize();
+
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerdown", onDown, { passive: true });
     window.addEventListener("pointerup", onUp, { passive: true });
+    window.addEventListener("scroll", touch, { passive: true });
+    window.addEventListener("resize", resize);
     document.addEventListener("pointerleave", onLeave);
+
+    // --- Frame loop ---------------------------------------------------------
+    let raf = 0;
+    let last = performance.now();
+    let lastDraw = 0;
+    let slow = 0;
+    let fps = 60;
+    let ready = false;
+
+    function frame(now: number) {
+      raf = 0;
+      const reducedNow = reducedRef.current;
+      const settled = engine.isSettled();
+      const quiet = now - lastInput > 1200;
+      const idle = settled && quiet;
+
+      // Idle: half rate. Reduced motion: no loop at all, draw on demand.
+      if (!reducedNow && idle && now - lastDraw < IDLE_FRAME_MS - 1) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
+
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      lastDraw = now;
+
+      const snap = getFieldSnapshot();
+      const dim =
+        snap.dim ?? (snap.priority >= 10 ? 0.9 : homeRef.current ? 1 : 0.55);
+      const scrollY = window.scrollY;
+      const anchor = getFieldAnchor();
+
+      // The wordmark dissolves as you scroll away from the hero; sections
+      // may also drive the gathering themselves (the statement does).
+      const manual = getFieldAssemble();
+      const assemble =
+        manual ??
+        (snap.form === "wordmark" ? 1 - smoothstep(0.12, 0.7, scrollY / cssH) : 1);
+
+      engine.update({
+        dt: reducedNow ? 1 : dt,
+        time: now / 1000,
+        pointer,
+        halfH: HALF_HEIGHT,
+        halfW: HALF_HEIGHT * (cssW / cssH),
+        width: cssW,
+        height: cssH,
+        dpr,
+        scrollY,
+        anchor,
+        reduced: reducedNow,
+        dim,
+        assemble,
+      });
+      engine.draw();
+
+      if (!ready) {
+        ready = true;
+        root.dataset.field = "ready";
+      }
+
+      // Step quality down when the frame rate stays low (never judged while
+      // idling, since half rate is deliberate).
+      if (!reducedNow && !idle && dt > 0) {
+        fps += (1 / dt - fps) * 0.05;
+        slow = fps < 30 ? slow + dt : 0;
+        if (slow > 2.5 && level < 2) {
+          level += 1;
+          slow = 0;
+          if (level === 1) resize();
+          else engine.setDrawFraction(0.6);
+        }
+      }
+
+      if (!reducedNow || !settled) raf = requestAnimationFrame(frame);
+    }
+
+    function request() {
+      if (!raf && !document.hidden) raf = requestAnimationFrame(frame);
+    }
+    requestRef.current = request;
+    function onVisibility() {
+      if (document.hidden) {
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+      } else {
+        last = performance.now();
+        request();
+      }
+    }
+    document.addEventListener("visibilitychange", onVisibility);
+    request();
+
     return () => {
+      cancelled = true;
+      if (raf) cancelAnimationFrame(raf);
+      requestRef.current = () => {};
+      document.removeEventListener("visibilitychange", onVisibility);
+      document.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
-      document.removeEventListener("pointerleave", onLeave);
+      window.removeEventListener("scroll", touch);
+      window.removeEventListener("resize", resize);
+      unsubscribeField();
+      unsubscribeAnchor();
+      engine.dispose();
+      engineRef.current = null;
+      delete root.dataset.field;
+      delete root.dataset.fieldForm;
+      root.style.removeProperty("--field-accent");
     };
-  }, []);
-
-  useFrame((state, delta) => {
-    const engine = engineRef.current;
-    if (!engine) return;
-
-    const dt = Math.min(delta, 0.05);
-    const { width, height } = state.size;
-    const snap = getFieldSnapshot();
-    // Copy stays readable: the field is full strength on the home page and
-    // while a venture has attention, and recedes behind everything else.
-    const dim =
-      snap.dim ?? (snap.priority >= 10 ? 0.9 : isHome.current ? 1 : 0.55);
-
-    engine.update({
-      dt,
-      time: state.clock.elapsedTime,
-      pointer: pointer.current,
-      halfH: HALF_HEIGHT,
-      halfW: HALF_HEIGHT * (width / height),
-      width,
-      height,
-      dpr: state.gl.getPixelRatio(),
-      scrollY: window.scrollY,
-      anchor: getFieldAnchor(),
-      reduced: reducedRef.current,
-      dim,
-    });
-
-    if (!stats.current.ready) {
-      stats.current.ready = true;
-      document.documentElement.dataset.field = "ready";
-    }
-
-    // Step quality down when the frame rate stays low.
-    if (!reducedRef.current && delta > 0) {
-      const s = stats.current;
-      s.fps += (1 / delta - s.fps) * 0.05;
-      s.slow = s.fps < 30 ? s.slow + delta : 0;
-      if (s.slow > 2.5 && s.level < 3) {
-        s.level += 1;
-        s.slow = 0;
-        onDegrade(s.level);
-      }
-    }
-  });
-
-  return null;
-}
-
-export default function FieldCanvas({ theme, reduced, coarse }: FieldCanvasProps) {
-  const [level, setLevel] = useState(0);
-  const bloom = theme === "dark" && !coarse && level < 1;
+  }, [coarse]);
 
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0">
-      <Canvas
-        dpr={[1, level >= 2 ? 1 : 1.5]}
-        gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
-        camera={{ position: [0, 0, FIELD_CAMERA_Z], fov: FIELD_FOV, near: 0.1, far: 60 }}
-        frameloop={reduced ? "demand" : "always"}
-        resize={{ scroll: false }}
-      >
-        <Scene
-          theme={theme}
-          reduced={reduced}
-          coarse={coarse}
-          level={level}
-          onDegrade={setLevel}
-        />
-        {bloom && (
-          <EffectComposer multisampling={0}>
-            <Bloom
-              intensity={0.6}
-              luminanceThreshold={0.1}
-              luminanceSmoothing={0.85}
-              mipmapBlur
-              radius={0.65}
-            />
-          </EffectComposer>
-        )}
-      </Canvas>
-    </div>
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-0 h-full w-full"
+    />
   );
 }

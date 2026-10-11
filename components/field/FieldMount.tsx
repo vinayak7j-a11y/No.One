@@ -6,8 +6,8 @@ import { useTheme } from "next-themes";
 import { useFieldEnabled } from "@/hooks/useFieldEnabled";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
-// Three.js and the field engine are heavy. Loading them lazily and only in
-// the browser keeps them out of the first paint, so text still arrives first.
+// The field engine is client-only. Loading it lazily keeps it out of the
+// first paint, so text still arrives first.
 const FieldCanvas = dynamic(() => import("@/components/field/FieldCanvas"), {
   ssr: false,
 });
@@ -15,9 +15,7 @@ const FieldCanvas = dynamic(() => import("@/components/field/FieldCanvas"), {
 function supportsWebGL() {
   try {
     const canvas = document.createElement("canvas");
-    return Boolean(
-      canvas.getContext("webgl2") || canvas.getContext("webgl"),
-    );
+    return Boolean(canvas.getContext("webgl2"));
   } catch {
     return false;
   }

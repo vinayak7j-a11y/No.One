@@ -1,6 +1,7 @@
 import FieldAnchor from "@/components/field/FieldAnchor";
 import BigLinks from "@/components/home/BigLinks";
 import FieldSection from "@/components/home/FieldSection";
+import InkHeading from "@/components/home/InkHeading";
 import Manifesto from "@/components/home/Manifesto";
 import Reveal from "@/components/home/Reveal";
 import PageLayout from "@/components/layout/PageLayout";
@@ -92,14 +93,13 @@ export default function Home() {
               <Text as="p" size="caption" tone="subtle">
                 About
               </Text>
-              <Heading
+              <InkHeading
                 as="h2"
                 size="display"
                 className="mt-4"
                 style={DISPLAY_STYLE}
-              >
-                Karma, not categories.
-              </Heading>
+                text="Karma, not categories."
+              />
             </Reveal>
             <Reveal delay={0.1}>
               <Text size="lg" tone="muted">

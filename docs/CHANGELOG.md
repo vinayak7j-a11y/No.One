@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Field renderer rewritten in raw WebGL2; three.js, R3F and
+  postprocessing removed (ADR-033)
 - Living field refined: laws section/marquee and other extras removed,
   four distinct home layouts, accurate wordmark typography, performance
   pass (ADR-032)

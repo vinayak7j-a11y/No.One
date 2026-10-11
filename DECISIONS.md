@@ -722,3 +722,39 @@ Reason
 
 The first two passes made the field exist and then piled on effects. The
 page should read as one decision, not a collection of tricks.
+
+## ADR-033
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Replaced three.js, @react-three/fiber, @react-three/postprocessing and
+postprocessing with a dependency-free WebGL2 renderer
+(lib/field/gl.ts, shaders.ts, engine.ts). The whole field now ships as
+one lazy chunk of about 9 KB gzipped.
+
+Reason
+
+The field needs one point-sprite program and a second tiny one for
+dust. A general-purpose 3D library was by far the heaviest thing on the
+site for that. Bloom is replaced by a soft halo drawn inside each
+sprite. Colours are passed in display values and blended as-is, so no
+colour-space handling is needed.
+
+Frame budget: no rendering while the tab is hidden; 30 fps when the
+field has settled and nothing is moving; reduced motion renders only on
+change; frames that stay slow step down pixel ratio, then particle
+count. If WebGL2 or a shader is refused, the field disables itself with
+a console warning and the page is the plain site.
+
+Also added: the field's gather level (uAssemble). The wordmark dissolves
+as you scroll away from the hero, and the statement section builds the
+sphere as it is read (setFieldAssemble). The About heading thickens near
+the pointer using a text stroke (no font-weight change, so no reflow).
+
+Fixed: the statement's per-word progress now measures the section
+directly and clamps; the earlier scroll-offset version let words fall
+back to dim after the section ended.

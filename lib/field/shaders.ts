@@ -1,20 +1,29 @@
 /**
- * GLSL for the living field. Every particle carries two target positions
- * (aFrom, aTo) and four random numbers (aRand). The vertex shader does the
- * whole morph on the GPU:
+ * GLSL ES 3.00 for the living field. Every particle carries two target
+ * positions (aFrom, aTo) and four random numbers (aRand). The vertex shader
+ * does the whole morph on the GPU:
  *
  *  - each particle leaves on its own delay, so a form dissolves and
  *    reforms in waves instead of sliding as one block
  *  - while travelling it scatters and twists (the "travel" term)
+ *  - uAssemble gathers the cloud together (1) or lets it drift apart (0);
+ *    the page ties it to scroll, so reading a section builds the shape
  *  - at rest it shimmers (uJitter) and drifts on a slow flow field (uFlow)
  *  - the pointer pushes and swirls nearby particles
  *  - uBurst is a spring driven from JS (clicks, page changes, intro)
+ *
+ * Colours arrive in display (sRGB) values and are blended as-is, so no
+ * colour-space conversion is needed.
  */
-export const fieldVertexShader = /* glsl */ `
-attribute vec3 aFrom;
-attribute vec3 aTo;
-attribute vec4 aRand;
+export const fieldVertexShader = /* glsl */ `#version 300 es
+precision highp float;
 
+in vec3 aFrom;
+in vec3 aTo;
+in vec4 aRand;
+
+uniform mat4 uMV;
+uniform mat4 uProj;
 uniform float uT;
 uniform float uTime;
 uniform float uSize;
@@ -23,11 +32,12 @@ uniform float uBurst;
 uniform float uJitter;
 uniform float uFlow;
 uniform float uAgitate;
+uniform float uAssemble;
 uniform vec3 uMouse;
 
-varying float vMix;
-varying float vGlow;
-varying float vFade;
+out float vMix;
+out float vGlow;
+out float vFade;
 
 mat2 rot(float a) {
   float c = cos(a);
@@ -44,6 +54,12 @@ void main() {
   vec3 dir = normalize(aRand.yzw - 0.5 + 0.0001);
   p += dir * travel * (0.7 + aRand.w * 1.8);
   p.xz = rot(travel * (aRand.y - 0.5) * 3.6) * p.xz;
+
+  // Gathering: every particle has its own moment to fall into place.
+  float gather = smoothstep(aRand.x * 0.55, aRand.x * 0.55 + 0.45, uAssemble);
+  float loose = 1.0 - gather;
+  p += normalize(aRand.wzy - 0.5 + 0.0001) * loose * (1.8 + aRand.z * 3.2);
+  p.xz = rot(loose * (aRand.y - 0.5) * 2.4) * p.xz;
 
   float tt = uTime * 0.55 + aRand.x * 6.2831;
   vec3 wob = vec3(
@@ -62,7 +78,7 @@ void main() {
 
   p += normalize(p + 0.0001) * uBurst * (1.0 + aRand.z * 2.0) * 0.6;
 
-  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  vec4 mv = uMV * vec4(p, 1.0);
 
   vec2 dm = mv.xy - uMouse.xy;
   float d = length(dm);
@@ -71,40 +87,80 @@ void main() {
   mv.xy += away * rep * rep * 0.5;
   mv.xy += vec2(-away.y, away.x) * rep * 0.18;
 
-  gl_Position = projectionMatrix * mv;
+  gl_Position = uProj * mv;
 
   float depth = -mv.z;
-  vFade = clamp(1.25 - (depth - 4.5) / 5.5, 0.25, 1.0);
+  vFade = clamp(1.25 - (depth - 4.5) / 5.5, 0.25, 1.0) * mix(0.3, 1.0, gather);
   vGlow = travel * 0.8 + rep;
   vMix = aRand.y;
-  gl_PointSize = uSize * uPx * (0.45 + aRand.w) * (1.0 + travel * 0.5 + rep * 0.9) * (7.0 / depth);
+  // The quad is 1.7x the visible dot: the extra margin holds a soft halo.
+  gl_PointSize = 1.7 * uSize * uPx * (0.45 + aRand.w) *
+    (1.0 + travel * 0.5 + rep * 0.9) * (7.0 / depth);
 }
 `;
 
-export const fieldFragmentShader = /* glsl */ `
+export const fieldFragmentShader = /* glsl */ `#version 300 es
+precision highp float;
+
 uniform vec3 uColA;
 uniform vec3 uColB;
 uniform float uAlpha;
 uniform float uDim;
 uniform float uLight;
 
-varying float vMix;
-varying float vGlow;
-varying float vFade;
+in float vMix;
+in float vGlow;
+in float vFade;
+
+out vec4 outColor;
 
 void main() {
   vec2 c = gl_PointCoord - 0.5;
-  float d = length(c);
-  if (d > 0.5) discard;
+  float r = length(c) * 2.0;
+  if (r > 1.0) discard;
 
-  float a = pow(1.0 - d * 2.0, 1.7);
+  // Bright core (the dot itself) plus a faint halo in the margin.
+  float core = pow(max(1.0 - r / 0.588, 0.0), 1.7);
+  float halo = pow(1.0 - r, 3.0) * mix(0.2, 0.08, uLight);
+  float a = core + halo;
+
   vec3 col = mix(uColA, uColB, vMix);
   // Dark theme glows brighter near motion; light theme leans toward the
   // second colour instead, since white would vanish on a light page.
   col += (1.0 - uLight) * vec3(vGlow * 0.3);
   col = mix(col, uColB, uLight * clamp(vGlow * 0.5, 0.0, 1.0));
 
-  gl_FragColor = vec4(col, a * uAlpha * vFade * uDim);
-  #include <colorspace_fragment>
+  outColor = vec4(col, a * uAlpha * vFade * uDim);
+}
+`;
+
+/** Far dust: a static shell of tiny glints that never morphs. */
+export const dustVertexShader = /* glsl */ `#version 300 es
+precision highp float;
+
+in vec3 aPos;
+uniform mat4 uMV;
+uniform mat4 uProj;
+uniform float uSize;
+uniform float uPx;
+
+void main() {
+  vec4 mv = uMV * vec4(aPos, 1.0);
+  gl_Position = uProj * mv;
+  gl_PointSize = uSize * uPx * (7.0 / -mv.z);
+}
+`;
+
+export const dustFragmentShader = /* glsl */ `#version 300 es
+precision highp float;
+
+uniform vec3 uColor;
+uniform float uAlpha;
+out vec4 outColor;
+
+void main() {
+  float r = length(gl_PointCoord - 0.5) * 2.0;
+  if (r > 1.0) discard;
+  outColor = vec4(uColor, pow(1.0 - r, 1.6) * uAlpha);
 }
 `;

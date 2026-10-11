@@ -1,16 +1,18 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   motion,
   useInView,
-  useScroll,
+  useMotionValue,
+  useMotionValueEvent,
   useTransform,
   type MotionValue,
 } from "framer-motion";
 import Section from "@/components/layout/Section";
 import Text from "@/components/ui/Text";
 import { useFieldClaim } from "@/hooks/useFieldClaim";
+import { setFieldAssemble } from "@/lib/field/assemble";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 /** From docs/VISION.md. */
@@ -56,12 +58,51 @@ export default function Manifesto() {
   const reduced = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { margin: "-35% 0px -35% 0px" });
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
-  });
+  const scrollYProgress = useMotionValue(0);
+
+  // Progress is measured directly (0 when the pinned section reaches the
+  // top, 1 when it is about to release) and clamped, so it holds at 1 once
+  // you scroll past instead of depending on a library's offset maths.
+  useEffect(() => {
+    if (reduced) return;
+    let raf = 0;
+    function measure() {
+      raf = 0;
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const travel = rect.height - window.innerHeight;
+      scrollYProgress.set(
+        travel > 0 ? Math.min(1, Math.max(0, -rect.top / travel)) : 0,
+      );
+    }
+    function onScroll() {
+      if (!raf) raf = requestAnimationFrame(measure);
+    }
+    measure();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [reduced, scrollYProgress]);
 
   useFieldClaim("seed", inView, 5, 0, 0.42);
+
+  // The cloud gathers into its shape as the statement is read: loose at the
+  // first word, fully formed by the last.
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    if (inView && !reduced) setFieldAssemble(Math.min(1, v / 0.85));
+  });
+  useEffect(() => {
+    if (!inView || reduced) {
+      setFieldAssemble(null);
+      return;
+    }
+    return () => setFieldAssemble(null);
+  }, [inView, reduced]);
 
   if (reduced) {
     return (
