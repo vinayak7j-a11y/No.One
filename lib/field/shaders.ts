@@ -66,10 +66,10 @@ void main() {
 
   vec2 dm = mv.xy - uMouse.xy;
   float d = length(dm);
-  float rep = smoothstep(1.6, 0.0, d);
+  float rep = smoothstep(1.05, 0.0, d);
   vec2 away = dm / (d + 0.0001);
-  mv.xy += away * rep * rep * 0.9;
-  mv.xy += vec2(-away.y, away.x) * rep * 0.35;
+  mv.xy += away * rep * rep * 0.5;
+  mv.xy += vec2(-away.y, away.x) * rep * 0.18;
 
   gl_Position = projectionMatrix * mv;
 

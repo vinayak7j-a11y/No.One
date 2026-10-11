@@ -25,4 +25,6 @@ export type FieldSide = -1 | 0 | 1;
 
 export interface FieldClaimOptions {
   side?: FieldSide;
+  /** Field strength while this claim is winning. Lower keeps copy legible. */
+  dim?: number;
 }

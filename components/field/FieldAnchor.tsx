@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { setFieldAnchor } from "@/lib/field/anchor";
+import { lettersCentreOffset } from "@/lib/field/wordmark";
 import { cn } from "@/lib/utils/cn";
 
 interface FieldAnchorProps {
@@ -26,11 +27,25 @@ export default function FieldAnchor({ children, className }: FieldAnchorProps) {
     function measure() {
       if (!element) return;
       const rect = element.getBoundingClientRect();
+      const cs = getComputedStyle(element);
+      const size = parseFloat(cs.fontSize) || 16;
+      const spacingPx = parseFloat(cs.letterSpacing);
+      const font = {
+        family: cs.fontFamily,
+        weight: parseInt(cs.fontWeight, 10) || 600,
+        letterSpacingEm: Number.isFinite(spacingPx) ? spacingPx / size : 0,
+      };
       setFieldAnchor({
         cx: rect.left + rect.width / 2,
         cy: rect.top + window.scrollY + rect.height / 2,
         w: rect.width,
         h: rect.height,
+        dy: lettersCentreOffset(element.textContent ?? "", size, rect.height, {
+          fontFamily: font.family,
+          weight: font.weight,
+          letterSpacingEm: font.letterSpacingEm,
+        }),
+        font,
       });
     }
 

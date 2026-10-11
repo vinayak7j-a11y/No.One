@@ -15,12 +15,15 @@ interface Claim {
   form: FieldFormId;
   priority: number;
   side: FieldSide | null;
+  dim: number | null;
 }
 
 export interface FieldSnapshot {
   form: FieldFormId;
   side: FieldSide | null;
   priority: number;
+  /** How strongly the winning claim wants the field to show (0 to 1). */
+  dim: number | null;
   pulseSeq: number;
   pulseStrength: number;
 }
@@ -32,6 +35,7 @@ let snapshot: FieldSnapshot = {
   form: "rest",
   side: null,
   priority: 0,
+  dim: null,
   pulseSeq: 0,
   pulseStrength: 0,
 };
@@ -49,12 +53,14 @@ function recompute() {
   const form = best?.form ?? "rest";
   const side = best?.side ?? null;
   const priority = best?.priority ?? 0;
+  const dim = best?.dim ?? null;
   if (
     form !== snapshot.form ||
     side !== snapshot.side ||
-    priority !== snapshot.priority
+    priority !== snapshot.priority ||
+    dim !== snapshot.dim
   ) {
-    snapshot = { ...snapshot, form, side, priority };
+    snapshot = { ...snapshot, form, side, priority, dim };
     emit();
   }
 }
@@ -67,7 +73,12 @@ export function claimField(
 ) {
   // Delete first so a re-claim moves to the end of the map and wins ties.
   claims.delete(id);
-  claims.set(id, { form, priority, side: options?.side ?? null });
+  claims.set(id, {
+    form,
+    priority,
+    side: options?.side ?? null,
+    dim: options?.dim ?? null,
+  });
   recompute();
 }
 

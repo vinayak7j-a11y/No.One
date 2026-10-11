@@ -593,3 +593,12 @@ Waiting
 - Verified with tsc --noEmit, eslint (clean), next build --webpack,
   headless screenshots (dark, light, mobile) and a wheel-navigation
   test at the page edge.
+
+## P4-T3: Living field refinement (completed)
+
+- Removed invented sections and gimmicks; copy sourced from the repo.
+- Four distinct home layouts; field acts as background (per-claim dim).
+- Wordmark typography and baseline matched to the real heading.
+- Performance pass (DPR, passes, reveals).
+- Verified with tsc, eslint, next build --webpack, and headless
+  screenshots with the real Geist font (dark, light, mobile).

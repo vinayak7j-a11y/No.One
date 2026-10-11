@@ -17,12 +17,13 @@ export function useFieldClaim(
   active: boolean,
   priority = 5,
   side?: FieldSide,
+  dim?: number,
 ) {
   const id = useId();
 
   useEffect(() => {
     if (!active || !form) return;
-    claimField(id, form, priority, { side });
+    claimField(id, form, priority, { side, dim });
     return () => releaseField(id);
-  }, [id, active, form, priority, side]);
+  }, [id, active, form, priority, side, dim]);
 }

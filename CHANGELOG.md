@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Changed
+
+- Living field refined: laws section/marquee and other extras removed,
+  four distinct home layouts, accurate wordmark typography, performance
+  pass (ADR-032)
+
 ### Added
 
 - Living field v2: dust depth, aberration + vignette, hue-following

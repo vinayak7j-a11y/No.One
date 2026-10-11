@@ -313,7 +313,7 @@ export class FieldEngine {
     u.uTime.value = f.time;
     u.uPx.value = f.dpr;
     u.uSize.value =
-      1.9 *
+      1.65 *
       this.lightBoost *
       this.size *
       Math.max(0.75, Math.min(1.35, f.height / 900));
@@ -394,7 +394,7 @@ export class FieldEngine {
       const perPx = (2 * f.halfH) / f.height;
       return {
         x: (f.anchor.cx - f.width / 2) * perPx,
-        y: -(f.anchor.cy - f.scrollY - f.height / 2) * perPx,
+        y: -(f.anchor.cy + f.anchor.dy - f.scrollY - f.height / 2) * perPx,
         s: (f.anchor.w * perPx) / WORDMARK_UNITS,
         rx: 0,
         rz: 0,

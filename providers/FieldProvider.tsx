@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import FieldHud from "@/components/field/FieldHud";
 import FieldMount from "@/components/field/FieldMount";
 import { formForPath } from "@/config/field";
 import { claimField, pulseField, releaseField } from "@/lib/field/attention";
@@ -31,10 +30,5 @@ export default function FieldProvider() {
     pulseField(1.2);
   }, [pathname]);
 
-  return (
-    <>
-      <FieldMount />
-      <FieldHud />
-    </>
-  );
+  return <FieldMount />;
 }

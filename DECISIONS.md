@@ -687,3 +687,38 @@ place. Lenis smooth scroll was considered and rejected: PageTransition
 navigates on wheel/touch at the page edges, and momentum scrolling
 would trigger it unpredictably. Everything respects reduced motion, and
 the field's off switch removes the caption too.
+
+## ADR-032
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Refined the living field and the home page; supersedes parts of ADR-031.
+
+Removed: the laws marquee, the "Five laws" section, split-word heading
+reveals, magnetic buttons, the bottom-left caption, and the chromatic
+aberration and vignette passes. None of it came from the project's own
+copy, and the word-mask reveal could leave a word unrevealed (an element
+translated fully outside an overflow:hidden parent never intersects).
+
+Changed:
+- Every line of home copy now comes from VISION.md or the existing About
+  and Projects pages. Nothing is invented.
+- Each home section has its own layout: pinned scroll-read statement,
+  split ventures index, one oversized line plus a quiet column, and two
+  oversized links. The field is background (claims carry a `dim`).
+- Wordmark accuracy: the sampler reads the heading's real font, weight
+  and letter-spacing, and the anchor reports the vertical offset from the
+  line box to the lettering, from the same canvas font metrics.
+- Performance: DPR cap 1.5, softer and smaller pointer push, smaller
+  particles, two fewer post-processing passes, reveals use opacity and
+  transform only (no blur filter).
+- The cursor ring only appears over things you can press.
+
+Reason
+
+The first two passes made the field exist and then piled on effects. The
+page should read as one decision, not a collection of tricks.

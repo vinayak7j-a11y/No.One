@@ -14,9 +14,9 @@ function subscribe(callback: () => void) {
 }
 
 /**
- * A soft ring that trails the real cursor. The native cursor stays (so
- * nothing is hidden from anyone); the ring grows over anything
- * interactive and tightens while pressed. Mouse and trackpad only.
+ * A thin ring that appears only around things you can press, trails the
+ * pointer slightly, and tightens while pressed. Over plain space there is
+ * nothing but the normal cursor. Mouse and trackpad only.
  */
 export default function Cursor() {
   const reduced = useReducedMotion();
@@ -28,12 +28,11 @@ export default function Cursor() {
 
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
-  const scale = useMotionValue(1);
-  const opacity = useMotionValue(0);
+  const scale = useMotionValue(0);
 
-  const sx = useSpring(x, { stiffness: 380, damping: 32, mass: 0.5 });
-  const sy = useSpring(y, { stiffness: 380, damping: 32, mass: 0.5 });
-  const ss = useSpring(scale, { stiffness: 320, damping: 24 });
+  const sx = useSpring(x, { stiffness: 420, damping: 34, mass: 0.45 });
+  const sy = useSpring(y, { stiffness: 420, damping: 34, mass: 0.45 });
+  const ss = useSpring(scale, { stiffness: 300, damping: 26 });
 
   const enabled = fine && !reduced;
 
@@ -45,21 +44,21 @@ export default function Cursor() {
       if (e.pointerType !== "mouse") return;
       x.set(e.clientX);
       y.set(e.clientY);
-      opacity.set(1);
     }
     function onOver(e: PointerEvent) {
       const target = e.target as Element | null;
       over = Boolean(target?.closest?.(INTERACTIVE));
-      scale.set(over ? 1.9 : 1);
+      scale.set(over ? 1 : 0);
     }
     function onDown() {
-      scale.set(over ? 1.4 : 0.7);
+      if (over) scale.set(0.75);
     }
     function onUp() {
-      scale.set(over ? 1.9 : 1);
+      if (over) scale.set(1);
     }
     function onLeave() {
-      opacity.set(0);
+      over = false;
+      scale.set(0);
     }
 
     window.addEventListener("pointermove", onMove, { passive: true });
@@ -74,15 +73,15 @@ export default function Cursor() {
       window.removeEventListener("pointerup", onUp);
       document.removeEventListener("pointerleave", onLeave);
     };
-  }, [enabled, x, y, scale, opacity]);
+  }, [enabled, x, y, scale]);
 
   if (!enabled) return null;
 
   return (
     <motion.div
       aria-hidden="true"
-      className="pointer-events-none fixed left-0 top-0 z-[90] -ml-[17px] -mt-[17px] h-[34px] w-[34px] rounded-full border border-white mix-blend-difference"
-      style={{ x: sx, y: sy, scale: ss, opacity }}
+      className="pointer-events-none fixed left-0 top-0 z-[90] -ml-[22px] -mt-[22px] h-[44px] w-[44px] rounded-full border border-white mix-blend-difference"
+      style={{ x: sx, y: sy, scale: ss }}
     />
   );
 }

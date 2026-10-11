@@ -2,61 +2,41 @@
 
 import { useRef } from "react";
 import { useInView } from "framer-motion";
-import Section from "@/components/layout/Section";
 import { useFieldClaim } from "@/hooks/useFieldClaim";
-import { cn } from "@/lib/utils/cn";
 import type { FieldFormId, FieldSide } from "@/types/field";
 
-type TextSide = "left" | "right" | "center";
-
-/** Copy on the left means the form sits on the right, and vice versa. */
-const FIELD_SIDE: Record<TextSide, FieldSide> = {
-  left: 1,
-  right: -1,
-  center: 0,
-};
-
 interface FieldSectionProps {
-  /** The shape the field takes while this section is on screen. */
+  /** The shape the field takes while this section holds the middle of the screen. */
   form: FieldFormId;
-  textSide?: TextSide;
+  /** 1 puts the shape on the right, -1 on the left, 0 behind the copy. */
+  side?: FieldSide;
+  /** Field strength while this section is active. Lower keeps copy crisp. */
+  dim?: number;
   className?: string;
   children: React.ReactNode;
 }
 
 /**
- * A full-height page section that claims the living field while it holds
- * the middle of the screen. Scroll is how the visitor moves attention
- * between sections; the field follows it (Law of Attention) and returns
- * to the page's resting form when the section leaves (Law of Return).
+ * Wraps a page section and claims the living field while it is the one in
+ * the middle of the screen. Scroll is how attention moves between sections;
+ * the field follows it and returns to the page's resting form when the
+ * section leaves. Layout is entirely up to the children.
  */
 export default function FieldSection({
   form,
-  textSide = "left",
+  side = 0,
+  dim,
   className,
   children,
 }: FieldSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { margin: "-50% 0px -50% 0px" });
+  const inView = useInView(ref, { margin: "-45% 0px -45% 0px" });
 
-  useFieldClaim(form, inView, 5, FIELD_SIDE[textSide]);
+  useFieldClaim(form, inView, 5, side, dim);
 
   return (
-    <div ref={ref}>
-      <Section
-        spacing="lg"
-        className={cn("flex min-h-screen items-center", className)}
-      >
-        <div
-          className={cn(
-            "w-full max-w-xl",
-            textSide === "right" && "md:ml-auto",
-            textSide === "center" && "mx-auto max-w-3xl text-center",
-          )}
-        >
-          {children}
-        </div>
-      </Section>
+    <div ref={ref} className={className}>
+      {children}
     </div>
   );
 }

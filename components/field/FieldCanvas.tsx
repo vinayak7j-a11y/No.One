@@ -3,12 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import {
-  Bloom,
-  ChromaticAberration,
-  EffectComposer,
-  Vignette,
-} from "@react-three/postprocessing";
+import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import * as THREE from "three";
 import {
   FIELD_CAMERA_Z,
@@ -16,7 +11,11 @@ import {
   FIELD_FOV,
   WORDMARK_UNITS,
 } from "@/config/field";
-import { getFieldAnchor } from "@/lib/field/anchor";
+import {
+  anchorFontKey,
+  getFieldAnchor,
+  subscribeFieldAnchor,
+} from "@/lib/field/anchor";
 import {
   getFieldSnapshot,
   pulseField,
@@ -38,26 +37,6 @@ interface SceneProps extends FieldCanvasProps {
 }
 
 const HALF_HEIGHT = Math.tan(THREE.MathUtils.degToRad(FIELD_FOV / 2)) * FIELD_CAMERA_Z;
-
-/** Shared with the post-processing pass. Module-level on purpose: the pass
- *  needs one stable vector that a frame loop can nudge without re-rendering. */
-const ABERRATION = new THREE.Vector2(0.0004, 0.0004);
-
-/** Splits the colour channels a little on every shockwave, then settles. */
-function AberrationDriver() {
-  const last = useRef({ seq: getFieldSnapshot().pulseSeq, at: -10 });
-  useFrame((state) => {
-    const snap = getFieldSnapshot();
-    if (snap.pulseSeq !== last.current.seq) {
-      last.current.seq = snap.pulseSeq;
-      last.current.at = state.clock.elapsedTime;
-    }
-    const age = state.clock.elapsedTime - last.current.at;
-    const amp = 0.0004 + 0.0032 * Math.exp(-age * 3.2);
-    ABERRATION.set(amp, amp);
-  });
-  return null;
-}
 
 function readBackground(theme: "dark" | "light") {
   const value = getComputedStyle(document.documentElement)
@@ -150,27 +129,40 @@ function Scene({ theme, reduced, coarse, level, onDegrade }: SceneProps) {
     engineRef.current?.setDrawFraction(level >= 3 ? 0.5 : 1);
   }, [level]);
 
-  // Sample the wordmark from the real font once it has loaded.
+  // Sample the wordmark in the heading's own font and tracking, and again
+  // whenever that typography changes (for example after a route change).
   useEffect(() => {
     let cancelled = false;
+    let lastKey = "";
+
     async function sample() {
       await document.fonts.ready;
-      if (cancelled || !engineRef.current) return;
+      const engine = engineRef.current;
+      if (cancelled || !engine) return;
+      const anchor = getFieldAnchor();
+      const key = anchorFontKey(anchor);
+      if (key === lastKey) return;
       const positions = sampleWordmark({
         text: "No.One",
-        count: engineRef.current.count,
-        fontFamily: getComputedStyle(document.body).fontFamily,
-        weight: 600,
+        count: engine.count,
+        fontFamily:
+          anchor?.font.family ?? getComputedStyle(document.body).fontFamily,
+        weight: anchor?.font.weight ?? 600,
+        letterSpacingEm: anchor?.font.letterSpacingEm ?? 0,
         units: WORDMARK_UNITS,
       });
       if (positions && !cancelled) {
-        engineRef.current?.setWordmark(positions);
+        lastKey = key;
+        engine.setWordmark(positions);
         invalidate();
       }
     }
+
     void sample();
+    const unsubscribe = subscribeFieldAnchor(() => void sample());
     return () => {
       cancelled = true;
+      unsubscribe();
     };
   }, [coarse, invalidate]);
 
@@ -215,7 +207,8 @@ function Scene({ theme, reduced, coarse, level, onDegrade }: SceneProps) {
     const snap = getFieldSnapshot();
     // Copy stays readable: the field is full strength on the home page and
     // while a venture has attention, and recedes behind everything else.
-    const dim = snap.priority >= 10 ? 0.9 : isHome.current ? 1 : 0.55;
+    const dim =
+      snap.dim ?? (snap.priority >= 10 ? 0.9 : isHome.current ? 1 : 0.55);
 
     engine.update({
       dt,
@@ -260,7 +253,7 @@ export default function FieldCanvas({ theme, reduced, coarse }: FieldCanvasProps
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0">
       <Canvas
-        dpr={[1, level >= 2 ? 1 : 2]}
+        dpr={[1, level >= 2 ? 1 : 1.5]}
         gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
         camera={{ position: [0, 0, FIELD_CAMERA_Z], fov: FIELD_FOV, near: 0.1, far: 60 }}
         frameloop={reduced ? "demand" : "always"}
@@ -273,7 +266,6 @@ export default function FieldCanvas({ theme, reduced, coarse }: FieldCanvasProps
           level={level}
           onDegrade={setLevel}
         />
-        {bloom && <AberrationDriver />}
         {bloom && (
           <EffectComposer multisampling={0}>
             <Bloom
@@ -283,12 +275,6 @@ export default function FieldCanvas({ theme, reduced, coarse }: FieldCanvasProps
               mipmapBlur
               radius={0.65}
             />
-            <ChromaticAberration
-              offset={ABERRATION}
-              radialModulation
-              modulationOffset={0.35}
-            />
-            <Vignette eskil={false} offset={0.28} darkness={0.7} />
           </EffectComposer>
         )}
       </Canvas>

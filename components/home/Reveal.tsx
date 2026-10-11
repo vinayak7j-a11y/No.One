@@ -10,8 +10,9 @@ interface RevealProps {
 }
 
 /**
- * Lets copy arrive as it scrolls into view (a rise and a focus-pull).
- * Reduced-motion visitors get the content with no animation at all.
+ * Lets content arrive as it scrolls into view with a short rise and fade.
+ * Opacity and transform only, so it stays on the compositor. Reduced-motion
+ * visitors get the content with no animation at all.
  */
 export default function Reveal({ children, className, delay = 0 }: RevealProps) {
   const reducedMotion = useReducedMotion();
@@ -23,10 +24,10 @@ export default function Reveal({ children, className, delay = 0 }: RevealProps) 
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 28, filter: "blur(6px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-      transition={{ duration: 0.9, delay, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>

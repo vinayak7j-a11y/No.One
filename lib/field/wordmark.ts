@@ -5,32 +5,60 @@ interface WordmarkOptions {
   count: number;
   fontFamily: string;
   weight: number;
+  /** Tracking of the real heading, in em (negative tightens). */
+  letterSpacingEm?: number;
   /** Width of the lettering in world units. */
   units: number;
 }
 
+const SAMPLE_SIZE = 260;
+
+type SpacedContext = CanvasRenderingContext2D & { letterSpacing?: string };
+
+function setup(ctx: SpacedContext, size: number, o: Pick<WordmarkOptions, "weight" | "fontFamily" | "letterSpacingEm">) {
+  ctx.font = `${o.weight} ${size}px ${o.fontFamily}`;
+  if ("letterSpacing" in ctx) {
+    ctx.letterSpacing = `${(o.letterSpacingEm ?? 0) * size}px`;
+  }
+}
+
+/**
+ * Vertical distance, in px, from the centre of a line box to the visual
+ * centre of the lettering. Both the anchor (DOM side) and the sampler use
+ * the same canvas font metrics, so the particles sit on the real baseline.
+ */
+export function lettersCentreOffset(
+  text: string,
+  size: number,
+  lineHeightPx: number,
+  o: Pick<WordmarkOptions, "weight" | "fontFamily" | "letterSpacingEm">,
+): number {
+  const ctx = document.createElement("canvas").getContext("2d") as SpacedContext | null;
+  if (!ctx) return 0;
+  setup(ctx, size, o);
+  const m = ctx.measureText(text);
+  const fa = m.fontBoundingBoxAscent ?? size * 0.8;
+  const fd = m.fontBoundingBoxDescent ?? size * 0.2;
+  const baseline = (lineHeightPx - (fa + fd)) / 2 + fa;
+  const glyphCentre = baseline - (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
+  return glyphCentre - lineHeightPx / 2;
+}
+
 /**
  * Turns real, rendered text into particle positions: draw the text on an
- * offscreen canvas in the site's own font, collect every lit pixel, then
- * pick `count` of them at random. Because it samples the same font the
- * heading uses, the particles line up with the heading's on-screen width.
+ * offscreen canvas in the heading's own font and tracking, collect every
+ * lit pixel, then pick `count` of them at random.
  *
  * Browser only (needs a canvas), so it is called from the field canvas,
  * never during server rendering.
  */
-export function sampleWordmark({
-  text,
-  count,
-  fontFamily,
-  weight,
-  units,
-}: WordmarkOptions): Float32Array | null {
-  const fontSize = 260;
-  const font = `${weight} ${fontSize}px ${fontFamily}`;
+export function sampleWordmark(o: WordmarkOptions): Float32Array | null {
+  const { text, count, units } = o;
+  const fontSize = SAMPLE_SIZE;
 
-  const probe = document.createElement("canvas").getContext("2d");
+  const probe = document.createElement("canvas").getContext("2d") as SpacedContext | null;
   if (!probe) return null;
-  probe.font = font;
+  setup(probe, fontSize, o);
   const metrics = probe.measureText(text);
   const pad = 40;
   const width = Math.ceil(metrics.width) + pad * 2;
@@ -39,9 +67,9 @@ export function sampleWordmark({
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const ctx = canvas.getContext("2d", { willReadFrequently: true }) as SpacedContext | null;
   if (!ctx) return null;
-  ctx.font = font;
+  setup(ctx, fontSize, o);
   ctx.textBaseline = "alphabetic";
   ctx.fillStyle = "#fff";
   const baseline = Math.round(height * 0.72);
