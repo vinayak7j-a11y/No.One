@@ -3,9 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Bloom, EffectComposer } from "@react-three/postprocessing";
+import {
+  Bloom,
+  ChromaticAberration,
+  EffectComposer,
+  Vignette,
+} from "@react-three/postprocessing";
 import * as THREE from "three";
-import { FIELD_CAMERA_Z, FIELD_FOV, WORDMARK_UNITS } from "@/config/field";
+import {
+  FIELD_CAMERA_Z,
+  FIELD_FORMS,
+  FIELD_FOV,
+  WORDMARK_UNITS,
+} from "@/config/field";
 import { getFieldAnchor } from "@/lib/field/anchor";
 import {
   getFieldSnapshot,
@@ -29,6 +39,26 @@ interface SceneProps extends FieldCanvasProps {
 
 const HALF_HEIGHT = Math.tan(THREE.MathUtils.degToRad(FIELD_FOV / 2)) * FIELD_CAMERA_Z;
 
+/** Shared with the post-processing pass. Module-level on purpose: the pass
+ *  needs one stable vector that a frame loop can nudge without re-rendering. */
+const ABERRATION = new THREE.Vector2(0.0004, 0.0004);
+
+/** Splits the colour channels a little on every shockwave, then settles. */
+function AberrationDriver() {
+  const last = useRef({ seq: getFieldSnapshot().pulseSeq, at: -10 });
+  useFrame((state) => {
+    const snap = getFieldSnapshot();
+    if (snap.pulseSeq !== last.current.seq) {
+      last.current.seq = snap.pulseSeq;
+      last.current.at = state.clock.elapsedTime;
+    }
+    const age = state.clock.elapsedTime - last.current.at;
+    const amp = 0.0004 + 0.0032 * Math.exp(-age * 3.2);
+    ABERRATION.set(amp, amp);
+  });
+  return null;
+}
+
 function readBackground(theme: "dark" | "light") {
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue("--background")
@@ -46,6 +76,7 @@ function Scene({ theme, reduced, coarse, level, onDegrade }: SceneProps) {
   const isHome = useRef(pathname === "/");
   const reducedRef = useRef(reduced);
   const stats = useRef({ fps: 60, slow: 0, level: 0, ready: false });
+  const themeRef = useRef(theme);
 
   // Latest props, readable from callbacks without re-subscribing.
   useEffect(() => {
@@ -53,6 +84,19 @@ function Scene({ theme, reduced, coarse, level, onDegrade }: SceneProps) {
     reducedRef.current = reduced;
     invalidate();
   }, [pathname, reduced, invalidate]);
+
+  // Publish the current form's accent hue as a CSS variable so the page
+  // (glow, progress bar, caption) can follow what the field is showing.
+  useEffect(() => {
+    themeRef.current = theme;
+    const form = document.documentElement.dataset.fieldForm;
+    if (form && form in FIELD_FORMS) {
+      document.documentElement.style.setProperty(
+        "--field-accent",
+        FIELD_FORMS[form as keyof typeof FIELD_FORMS][theme][1],
+      );
+    }
+  }, [theme]);
 
   // Create the engine once per particle budget and wire it to the store.
   useEffect(() => {
@@ -69,6 +113,10 @@ function Scene({ theme, reduced, coarse, level, onDegrade }: SceneProps) {
       const snap = getFieldSnapshot();
       engine.setTarget(snap.form, snap.side, reducedRef.current);
       document.documentElement.dataset.fieldForm = snap.form;
+      document.documentElement.style.setProperty(
+        "--field-accent",
+        FIELD_FORMS[snap.form][themeRef.current][1],
+      );
       if (snap.pulseSeq !== lastPulse) {
         lastPulse = snap.pulseSeq;
         if (!reducedRef.current) engine.pulse(snap.pulseStrength);
@@ -86,6 +134,7 @@ function Scene({ theme, reduced, coarse, level, onDegrade }: SceneProps) {
       engineRef.current = null;
       delete document.documentElement.dataset.field;
       delete document.documentElement.dataset.fieldForm;
+      document.documentElement.style.removeProperty("--field-accent");
     };
     // `theme` is applied by its own effect below; re-creating the engine
     // on a theme change would throw away the current form.
@@ -224,6 +273,7 @@ export default function FieldCanvas({ theme, reduced, coarse }: FieldCanvasProps
           level={level}
           onDegrade={setLevel}
         />
+        {bloom && <AberrationDriver />}
         {bloom && (
           <EffectComposer multisampling={0}>
             <Bloom
@@ -233,6 +283,12 @@ export default function FieldCanvas({ theme, reduced, coarse }: FieldCanvasProps
               mipmapBlur
               radius={0.65}
             />
+            <ChromaticAberration
+              offset={ABERRATION}
+              radialModulation
+              modulationOffset={0.35}
+            />
+            <Vignette eskil={false} offset={0.28} darkness={0.7} />
           </EffectComposer>
         )}
       </Canvas>

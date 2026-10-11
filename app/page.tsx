@@ -1,10 +1,14 @@
 import FieldAnchor from "@/components/field/FieldAnchor";
 import FieldSection from "@/components/home/FieldSection";
+import LawsMarquee from "@/components/home/LawsMarquee";
+import LawsSection from "@/components/home/LawsSection";
 import Reveal from "@/components/home/Reveal";
+import SplitHeading from "@/components/home/SplitHeading";
 import PageLayout from "@/components/layout/PageLayout";
 import Section from "@/components/layout/Section";
 import Button from "@/components/ui/Button";
 import Heading from "@/components/ui/Heading";
+import Magnetic from "@/components/ui/Magnetic";
 import Text from "@/components/ui/Text";
 import VentureList from "@/components/ventures/VentureList";
 
@@ -37,24 +41,33 @@ export default function Home() {
           </Text>
 
           <div className="mt-10 flex items-center justify-center gap-4">
-            <Button href="/about">About</Button>
-            <Button variant="outline" href="/projects">
-              Projects
-            </Button>
+            <Magnetic>
+              <Button href="/about">About</Button>
+            </Magnetic>
+            <Magnetic>
+              <Button variant="outline" href="/projects">
+                Projects
+              </Button>
+            </Magnetic>
           </div>
 
           <div aria-hidden="true" className="scroll-cue mx-auto mt-16" />
         </div>
       </Section>
 
+      <LawsMarquee />
+
       <FieldSection form="seed" textSide="left">
         <Reveal>
           <Text as="p" size="caption" tone="subtle">
             Digital headquarters
           </Text>
-          <Heading as="h2" size="h1" className="mt-4">
-            Not a portfolio.
-          </Heading>
+          <SplitHeading
+            as="h2"
+            size="h1"
+            className="mt-4"
+            text="Not a portfolio."
+          />
         </Reveal>
         <Reveal delay={0.12}>
           <Text size="lg" tone="muted" className="mt-8">
@@ -64,14 +77,19 @@ export default function Home() {
         </Reveal>
       </FieldSection>
 
+      <LawsSection />
+
       <FieldSection form="rest" textSide="center">
         <Reveal>
           <Text as="p" size="caption" tone="subtle">
             Ventures
           </Text>
-          <Heading as="h2" size="h1" className="mt-4">
-            Building in the open.
-          </Heading>
+          <SplitHeading
+            as="h2"
+            size="h1"
+            className="mt-4"
+            text="Building in the open."
+          />
           <Text size="lg" tone="muted" className="mx-auto mt-8 max-w-2xl">
             I don&apos;t rank these by success, and I don&apos;t treat them
             like finished resume lines.
@@ -87,9 +105,12 @@ export default function Home() {
           <Text as="p" size="caption" tone="subtle">
             About
           </Text>
-          <Heading as="h2" size="h1" className="mt-4">
-            Karma, not categories.
-          </Heading>
+          <SplitHeading
+            as="h2"
+            size="h1"
+            className="mt-4"
+            text="Karma, not categories."
+          />
         </Reveal>
         <Reveal delay={0.12}>
           <Text size="lg" tone="muted" className="mt-8">
@@ -108,9 +129,12 @@ export default function Home() {
           <Text as="p" size="caption" tone="subtle">
             Connect
           </Text>
-          <Heading as="h2" size="h1" className="mt-4">
-            Let&apos;s connect.
-          </Heading>
+          <SplitHeading
+            as="h2"
+            size="h1"
+            className="mt-4"
+            text="Let’s connect."
+          />
         </Reveal>
         <Reveal delay={0.12}>
           <Text size="lg" tone="muted" className="mt-8">

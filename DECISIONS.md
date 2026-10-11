@@ -657,3 +657,33 @@ Architecture
 - lib/field/engine.ts is a plain class (no React) driving a GPU morph
   shader between forms; the DOM wordmark is sampled from the real font.
 - Auto-degrade: no bloom, then DPR 1, then half the particles.
+
+## ADR-031
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Second pass on the living field: depth, hue-following UI and motion
+polish. No new dependencies.
+
+- Engine: a non-morphing dust shell with its own parallax; light theme
+  gets higher opacity and a bolder point.
+- Post-processing (dark, non-coarse only): chromatic aberration that
+  kicks on each shockwave and settles, plus a vignette, beside bloom.
+- The field publishes its current accent as --field-accent (registered
+  with @property so it blends). The ambient glow, scroll progress line,
+  text selection and a bottom-left caption follow it.
+- Home: laws marquee, a Five laws section (condensed from LANGUAGE.md),
+  word-mask heading reveals, magnetic hero buttons.
+- Cursor ring for fine pointers only; the native cursor stays.
+
+Reason
+
+The first pass made the field exist; this one makes it feel like a
+place. Lenis smooth scroll was considered and rejected: PageTransition
+navigates on wheel/touch at the page edges, and momentum scrolling
+would trigger it unpredictably. Everything respects reduced motion, and
+the field's off switch removes the caption too.

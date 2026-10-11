@@ -5,6 +5,8 @@ import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import PageTransition from "@/components/transitions/PageTransition";
 import AmbientGlow from "@/components/effects/AmbientGlow";
+import Cursor from "@/components/effects/Cursor";
+import ScrollProgress from "@/components/effects/ScrollProgress";
 import FieldProvider from "@/providers/FieldProvider";
 import "./globals.css";
 
@@ -58,6 +60,8 @@ export default function RootLayout({
           <FieldProvider />
           <AmbientGlow />
           <div aria-hidden="true" className="grain-overlay" />
+          <ScrollProgress />
+          <Cursor />
           <Navbar />
           <PageTransition>{children}</PageTransition>
           <Footer />

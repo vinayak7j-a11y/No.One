@@ -4,6 +4,8 @@
 
 ### Added
 
+- Living field v2: dust depth, aberration + vignette, hue-following
+  accent, laws marquee and section, split headings, cursor ring (ADR-031)
 - Living field: site-wide WebGL particle field, cinematic home,
   venture-driven morphs, footer off switch (ADR-030)
 

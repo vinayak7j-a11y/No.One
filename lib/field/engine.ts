@@ -44,7 +44,12 @@ type Theme = "dark" | "light";
  * damped here, so a change of mind mid-morph never produces a jump.
  */
 export class FieldEngine {
+  /** Add this to the scene. Holds the moving body and the far dust. */
   readonly group = new THREE.Group();
+  /** The morphing particle form; moved and scaled by the layout. */
+  private readonly body = new THREE.Group();
+  private readonly dust: THREE.Points;
+  private readonly dustMaterial: THREE.PointsMaterial;
   /** Assign to `scene.background`; eased toward the theme background. */
   readonly background = new THREE.Color("#000000");
   readonly count: number;
@@ -87,6 +92,7 @@ export class FieldEngine {
   private scrollPrev = 0;
   private agitate = 0;
   private started = false;
+  private lightBoost = 1;
 
   constructor(count: number) {
     this.count = count;
@@ -131,7 +137,49 @@ export class FieldEngine {
 
     const points = new THREE.Points(this.geometry, this.material);
     points.frustumCulled = false;
-    this.group.add(points);
+    this.body.add(points);
+
+    // A thin shell of far dust that never morphs. It drifts against the
+    // form with its own parallax, which is what makes the space read as deep.
+    const dustCount = Math.min(2600, Math.round(count / 12));
+    const dustPos = new Float32Array(dustCount * 3);
+    for (let i = 0; i < dustCount; i++) {
+      const r = 9 + Math.random() * 8;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      dustPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      dustPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.7;
+      dustPos[i * 3 + 2] = r * Math.cos(phi) - 6;
+    }
+    const dustGeometry = new THREE.BufferGeometry();
+    dustGeometry.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
+    // A tiny soft disc so dust reads as round glints, never squares.
+    const disc = document.createElement("canvas");
+    disc.width = disc.height = 32;
+    const dctx = disc.getContext("2d");
+    if (dctx) {
+      const g = dctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      g.addColorStop(0, "rgba(255,255,255,1)");
+      g.addColorStop(0.35, "rgba(255,255,255,0.55)");
+      g.addColorStop(1, "rgba(255,255,255,0)");
+      dctx.fillStyle = g;
+      dctx.fillRect(0, 0, 32, 32);
+    }
+    this.dustMaterial = new THREE.PointsMaterial({
+      map: new THREE.CanvasTexture(disc),
+      size: 0.06,
+      sizeAttenuation: true,
+      transparent: true,
+      depthWrite: false,
+      opacity: 0.5,
+      color: new THREE.Color("#a1a1aa"),
+      blending: THREE.AdditiveBlending,
+    });
+    this.dust = new THREE.Points(dustGeometry, this.dustMaterial);
+    this.dust.frustumCulled = false;
+
+    this.group.add(this.dust);
+    this.group.add(this.body);
   }
 
   /** Kick the intro: particles start flung outward and fall into place. */
@@ -148,8 +196,14 @@ export class FieldEngine {
     this.material.needsUpdate = true;
     const u = this.material.uniforms;
     u.uLight.value = dark ? 0 : 1;
+    // Light theme paints dark ink on white, which reads thinner than light
+    // on black, so it gets more opacity and a slightly bolder point.
     u.uAlpha.value =
-      (dark ? 0.5 : 0.62) * Math.pow(36000 / this.count, 0.6);
+      (dark ? 0.5 : 0.9) * Math.pow(36000 / this.count, 0.6);
+    this.lightBoost = dark ? 1 : 1.25;
+    this.dustMaterial.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
+    this.dustMaterial.color.set(dark ? "#a1a1aa" : "#52525b");
+    this.dustMaterial.needsUpdate = true;
   }
 
   /** Ask the field to take a form. Safe to call mid-morph. */
@@ -246,9 +300,9 @@ export class FieldEngine {
       damp(agitateTarget > this.agitate ? 8 : 2.5);
 
     const parallax = cfg.parallax;
-    this.group.position.set(this.lay.x, this.lay.y, -this.agitate * 0.9);
-    this.group.scale.setScalar(this.lay.s);
-    this.group.rotation.set(
+    this.body.position.set(this.lay.x, this.lay.y, -this.agitate * 0.9);
+    this.body.scale.setScalar(this.lay.s);
+    this.body.rotation.set(
       this.lay.rx - this.sy * 0.12 * parallax,
       this.autoRot + f.scrollY * 0.0003 * parallax + this.sx * 0.25 * parallax,
       this.lay.rz,
@@ -259,7 +313,10 @@ export class FieldEngine {
     u.uTime.value = f.time;
     u.uPx.value = f.dpr;
     u.uSize.value =
-      1.9 * this.size * Math.max(0.75, Math.min(1.35, f.height / 900));
+      1.9 *
+      this.lightBoost *
+      this.size *
+      Math.max(0.75, Math.min(1.35, f.height / 900));
     u.uBurst.value = this.burst;
     u.uJitter.value = this.jitter;
     u.uFlow.value = this.flow;
@@ -273,12 +330,23 @@ export class FieldEngine {
     (u.uColA.value as THREE.Color).copy(this.colA);
     (u.uColB.value as THREE.Color).copy(this.colB);
 
+    // Dust: slow orbit, opposite parallax to the form, and a scroll drift.
+    if (!f.reduced) this.dust.rotation.y += dt * 0.012;
+    this.dust.rotation.x = this.sy * 0.05;
+    this.dust.position.x = -this.sx * 0.5;
+    this.dust.position.y = (f.scrollY / Math.max(f.height, 1)) * 0.35;
+    this.dustMaterial.opacity =
+      (this.theme === "dark" ? 0.5 : 0.35) * (0.4 + 0.6 * this.dim);
+
     this.started = true;
   }
 
   dispose() {
     this.geometry.dispose();
     this.material.dispose();
+    this.dust.geometry.dispose();
+    this.dustMaterial.map?.dispose();
+    this.dustMaterial.dispose();
     this.cache.clear();
   }
 

@@ -584,3 +584,12 @@ Waiting
 - Footer on/off switch; reduced-motion and no-WebGL fallbacks.
 - Verified with tsc --noEmit, eslint (clean), next build --webpack, and
   headless screenshots.
+
+## P4-T2: Living field v2 (completed)
+
+- Dust depth layer, aberration + vignette, hue-following accent.
+- Laws marquee, Five laws section, split-word headings, magnetic
+  buttons, cursor ring, scroll progress, field caption.
+- Verified with tsc --noEmit, eslint (clean), next build --webpack,
+  headless screenshots (dark, light, mobile) and a wheel-navigation
+  test at the page edge.
