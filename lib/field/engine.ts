@@ -529,9 +529,9 @@ export class FieldEngine {
     let x = 0;
     let y = 0;
     if (wide) {
-      allowX = placement === 0 ? f.halfW * 0.9 : f.halfW * 0.55;
+      allowX = placement === 0 ? f.halfW * 0.9 : f.halfW * 0.44;
       allowY = f.halfH * 0.9;
-      x = placement * f.halfW * 0.43;
+      x = placement * f.halfW * 0.56;
     } else {
       allowX = f.halfW * 0.88;
       allowY = placement === 0 ? f.halfH * 0.8 : f.halfH * 0.55;

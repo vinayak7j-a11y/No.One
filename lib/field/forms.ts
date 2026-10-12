@@ -147,6 +147,40 @@ const bridge: Generator = (n, r) => {
   return out;
 };
 
+/**
+ * Broadcast: arcs spreading outward from a bright source, like a signal
+ * leaving a point. Used for Contact ("reach out").
+ */
+const signal: Generator = (n, r) => {
+  const out = new Float32Array(n * 3);
+  const rings = [0.5, 0.95, 1.4, 1.85, 2.3];
+  for (let i = 0; i < n; i++) {
+    let x: number;
+    let y: number;
+    let z: number;
+    const roll = r();
+    if (roll < 0.1) {
+      // The source: a dense little cluster.
+      x = -2.1 + gauss(r) * 0.16;
+      y = gauss(r) * 0.16;
+      z = gauss(r) * 0.16;
+    } else {
+      // Pick a ring (outer rings carry more points) and a point on its arc,
+      // opening toward +x.
+      const k = Math.min(rings.length - 1, Math.floor(Math.pow(r(), 0.8) * rings.length));
+      const rad = rings[k] + gauss(r) * 0.025;
+      const a = (r() * 2 - 1) * 0.95;
+      x = -2.1 + rad * Math.cos(a);
+      y = rad * Math.sin(a);
+      z = gauss(r) * 0.06 + Math.sin(a * 3 + k) * 0.12;
+    }
+    out[i * 3] = x;
+    out[i * 3 + 1] = y;
+    out[i * 3 + 2] = z;
+  }
+  return out;
+};
+
 /** Two tori that pass through each other (a Hopf link). */
 const link: Generator = (n, r) => {
   const out = new Float32Array(n * 3);
@@ -306,6 +340,7 @@ const GENERATORS: Record<Exclude<FieldFormId, "wordmark">, Generator> = {
   galaxy,
   sheets,
   bridge,
+  signal,
   link,
   loop,
   knot,

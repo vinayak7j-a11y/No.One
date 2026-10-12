@@ -11,6 +11,7 @@ export type FieldFormId =
   | "galaxy"
   | "sheets"
   | "bridge"
+  | "signal"
   | "link"
   | "loop"
   | "knot"
