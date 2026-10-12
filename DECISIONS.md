@@ -626,3 +626,135 @@ after returning to this tab and moving the cursor away. The original
 touch-only blur was written for a different bug and did not cover
 this case, since it only fires when there is no link and pinned
 gets toggled instead.
+
+## ADR-030
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Added a site-wide "living field": one fixed WebGL particle canvas
+(three, @react-three/fiber, @react-three/postprocessing) behind the
+whole site. Lazy-loaded on idle, client-only, off-switch in the footer
+(localStorage "noone:field"), full fallback to the plain site when
+WebGL is missing, reduced motion is set, or the visitor turns it off.
+
+Reason
+
+The field is native to the Laws, not decoration. It follows attention
+(a section or venture taking attention gives the field that shape and
+releases it afterwards: Return), every venture gets an equal particle
+share (Non-Ranking), and it recedes behind copy on inner pages (Rest).
+Text stays real DOM, so accessibility and SEO are unchanged.
+
+Architecture
+
+- lib/field/attention.ts is an external store of claims with
+  priorities (route 0, section 5, venture 10). Not React context, so
+  claims never re-render the tree.
+- lib/field/engine.ts is a plain class (no React) driving a GPU morph
+  shader between forms; the DOM wordmark is sampled from the real font.
+- Auto-degrade: no bloom, then DPR 1, then half the particles.
+
+## ADR-031
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Second pass on the living field: depth, hue-following UI and motion
+polish. No new dependencies.
+
+- Engine: a non-morphing dust shell with its own parallax; light theme
+  gets higher opacity and a bolder point.
+- Post-processing (dark, non-coarse only): chromatic aberration that
+  kicks on each shockwave and settles, plus a vignette, beside bloom.
+- The field publishes its current accent as --field-accent (registered
+  with @property so it blends). The ambient glow, scroll progress line,
+  text selection and a bottom-left caption follow it.
+- Home: laws marquee, a Five laws section (condensed from LANGUAGE.md),
+  word-mask heading reveals, magnetic hero buttons.
+- Cursor ring for fine pointers only; the native cursor stays.
+
+Reason
+
+The first pass made the field exist; this one makes it feel like a
+place. Lenis smooth scroll was considered and rejected: PageTransition
+navigates on wheel/touch at the page edges, and momentum scrolling
+would trigger it unpredictably. Everything respects reduced motion, and
+the field's off switch removes the caption too.
+
+## ADR-032
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Refined the living field and the home page; supersedes parts of ADR-031.
+
+Removed: the laws marquee, the "Five laws" section, split-word heading
+reveals, magnetic buttons, the bottom-left caption, and the chromatic
+aberration and vignette passes. None of it came from the project's own
+copy, and the word-mask reveal could leave a word unrevealed (an element
+translated fully outside an overflow:hidden parent never intersects).
+
+Changed:
+- Every line of home copy now comes from VISION.md or the existing About
+  and Projects pages. Nothing is invented.
+- Each home section has its own layout: pinned scroll-read statement,
+  split ventures index, one oversized line plus a quiet column, and two
+  oversized links. The field is background (claims carry a `dim`).
+- Wordmark accuracy: the sampler reads the heading's real font, weight
+  and letter-spacing, and the anchor reports the vertical offset from the
+  line box to the lettering, from the same canvas font metrics.
+- Performance: DPR cap 1.5, softer and smaller pointer push, smaller
+  particles, two fewer post-processing passes, reveals use opacity and
+  transform only (no blur filter).
+- The cursor ring only appears over things you can press.
+
+Reason
+
+The first two passes made the field exist and then piled on effects. The
+page should read as one decision, not a collection of tricks.
+
+## ADR-033
+
+Date
+
+FILL IN DATE
+
+Decision
+
+Replaced three.js, @react-three/fiber, @react-three/postprocessing and
+postprocessing with a dependency-free WebGL2 renderer
+(lib/field/gl.ts, shaders.ts, engine.ts). The whole field now ships as
+one lazy chunk of about 9 KB gzipped.
+
+Reason
+
+The field needs one point-sprite program and a second tiny one for
+dust. A general-purpose 3D library was by far the heaviest thing on the
+site for that. Bloom is replaced by a soft halo drawn inside each
+sprite. Colours are passed in display values and blended as-is, so no
+colour-space handling is needed.
+
+Frame budget: no rendering while the tab is hidden; 30 fps when the
+field has settled and nothing is moving; reduced motion renders only on
+change; frames that stay slow step down pixel ratio, then particle
+count. If WebGL2 or a shader is refused, the field disables itself with
+a console warning and the page is the plain site.
+
+Also added: the field's gather level (uAssemble). The wordmark dissolves
+as you scroll away from the hero, and the statement section builds the
+sphere as it is read (setFieldAssemble). The About heading thickens near
+the pointer using a text stroke (no font-weight change, so no reflow).
+
+Fixed: the statement's per-word progress now measures the section
+directly and clamps; the earlier scroll-offset version let words fall
+back to dim after the section ended.

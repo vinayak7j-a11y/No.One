@@ -3,15 +3,12 @@ import PageLayout from "@/components/layout/PageLayout";
 import Section from "@/components/layout/Section";
 import Heading from "@/components/ui/Heading";
 import Text from "@/components/ui/Text";
-import VentureRow from "@/components/ventures/VentureRow";
-import { ventures } from "@/data/ventures";
+import VentureList from "@/components/ventures/VentureList";
 
 export const metadata: Metadata = {
   title: "Projects",
   description: "Vinayak Joshi, building in the open.",
 };
-
-const STAGGER_PATTERN: (0 | 1 | 2)[] = [0, 2, 1, 0, 2];
 
 export default function ProjectsPage() {
   return (
@@ -35,13 +32,7 @@ export default function ProjectsPage() {
           </Text>
 
           <div className="mt-16">
-            {ventures.map((venture, i) => (
-              <VentureRow
-                key={venture.identity.name}
-                venture={venture}
-                stagger={STAGGER_PATTERN[i % STAGGER_PATTERN.length]}
-              />
-            ))}
+            <VentureList />
           </div>
         </div>
       </Section>

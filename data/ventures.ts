@@ -1,3 +1,5 @@
+import type { FieldFormId } from "@/types/field";
+
 export type VentureStage = "concept" | "prototype" | "active";
 
 /**
@@ -33,6 +35,12 @@ export interface Venture {
     name: string;
     stage: VentureStage;
     statusLabel: string;
+    /**
+     * The shape the living field takes while this venture has the
+     * visitor's attention (see components/field and LANGUAGE.md). It is
+     * visual identity, not a claim about the venture.
+     */
+    form?: FieldFormId;
   };
   content: {
     description: string;
@@ -50,6 +58,7 @@ export const ventures: Venture[] = [
       name: "Rent It",
       stage: "prototype",
       statusLabel: "In Development",
+      form: "link",
     },
     content: {
       description:
@@ -62,6 +71,7 @@ export const ventures: Venture[] = [
       name: "Keepl",
       stage: "active",
       statusLabel: "MVP, Validated",
+      form: "loop",
     },
     content: {
       description:
@@ -75,6 +85,7 @@ export const ventures: Venture[] = [
       name: "Bond",
       stage: "active",
       statusLabel: "Live",
+      form: "knot",
     },
     content: {
       description:
@@ -88,6 +99,7 @@ export const ventures: Venture[] = [
       name: "MessPass",
       stage: "active",
       statusLabel: "Live",
+      form: "grid",
     },
     content: {
       description:
@@ -101,6 +113,7 @@ export const ventures: Venture[] = [
       name: "No.One",
       stage: "active",
       statusLabel: "Live",
+      form: "orbit",
     },
     content: {
       description:
