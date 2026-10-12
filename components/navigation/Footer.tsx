@@ -1,5 +1,4 @@
 import Link from "next/link";
-import FieldToggle from "@/components/field/FieldToggle";
 import Container from "@/components/layout/Container";
 import Text from "@/components/ui/Text";
 import { NAV_ITEMS } from "@/config/site";
@@ -13,7 +12,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative z-10 border-t border-border">
+    <footer className="border-t border-border">
       <Container>
         <div className="flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between">
           <Text size="sm" tone="muted">
@@ -30,7 +29,6 @@ export default function Footer() {
                 {item.label}
               </Link>
             ))}
-            <FieldToggle />
           </nav>
         </div>
       </Container>

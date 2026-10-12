@@ -29,6 +29,3 @@ Fast development with consistent styling.
 ### Status
 
 Accepted.
-## ADR-030 (living field)
-
-See /DECISIONS.md, ADR-030.

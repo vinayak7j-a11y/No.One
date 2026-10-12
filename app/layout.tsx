@@ -5,9 +5,6 @@ import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import PageTransition from "@/components/transitions/PageTransition";
 import AmbientGlow from "@/components/effects/AmbientGlow";
-import Cursor from "@/components/effects/Cursor";
-import ScrollProgress from "@/components/effects/ScrollProgress";
-import FieldProvider from "@/providers/FieldProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -57,11 +54,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground flex min-h-screen flex-col`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <FieldProvider />
           <AmbientGlow />
           <div aria-hidden="true" className="grain-overlay" />
-          <ScrollProgress />
-          <Cursor />
           <Navbar />
           <PageTransition>{children}</PageTransition>
           <Footer />

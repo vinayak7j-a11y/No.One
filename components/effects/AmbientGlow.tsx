@@ -30,7 +30,7 @@ export default function AmbientGlow() {
       className="pointer-events-none fixed inset-0 z-0"
       style={{
         background:
-          "radial-gradient(700px circle at var(--glow-x, 50%) var(--glow-y, 50%), color-mix(in srgb, var(--field-accent, #f2f2f0) 16%, transparent), transparent 70%)",
+          "radial-gradient(650px circle at var(--glow-x, 50%) var(--glow-y, 50%), rgba(242,242,240,0.08), transparent 70%)",
       }}
     />
   );
