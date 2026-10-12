@@ -227,8 +227,8 @@ export class FieldEngine {
     this.setBlend(dark);
     // Light theme paints dark ink on white, which reads thinner than light
     // on black, so it gets more opacity and a slightly bolder point.
-    this.uAlpha = (dark ? 0.5 : 0.9) * Math.pow(36000 / this.count, 0.6);
-    this.lightBoost = dark ? 1 : 1.25;
+    this.uAlpha = (dark ? 0.85 : 1.0) * Math.pow(36000 / this.count, 0.6);
+    this.lightBoost = dark ? 1.2 : 1.45;
     this.dustColor = parseHex(dark ? "#a1a1aa" : "#52525b");
   }
 
@@ -362,7 +362,7 @@ export class FieldEngine {
       0,
       1,
     );
-    this.dustAlpha = (this.theme === "dark" ? 0.5 : 0.35) * (0.4 + 0.6 * this.dim);
+    this.dustAlpha = (this.theme === "dark" ? 0.6 : 0.45) * (0.5 + 0.5 * this.dim);
 
     this.uTime = f.time;
     this.uSize =

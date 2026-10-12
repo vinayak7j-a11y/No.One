@@ -89,7 +89,7 @@ export default function Manifesto() {
     };
   }, [reduced, scrollYProgress]);
 
-  useFieldClaim("seed", inView, 5, 0, 0.42);
+  useFieldClaim("seed", inView, 5, 0, 0.7);
 
   // The cloud gathers into its shape as the statement is read: loose at the
   // first word, fully formed by the last.

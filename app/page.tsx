@@ -9,7 +9,6 @@ import Section from "@/components/layout/Section";
 import Button from "@/components/ui/Button";
 import Heading from "@/components/ui/Heading";
 import Text from "@/components/ui/Text";
-import VentureList from "@/components/ventures/VentureList";
 
 const DISPLAY_STYLE = {
   fontSize: "clamp(3rem, 7.2vw, 6.5rem)",
@@ -59,76 +58,26 @@ export default function Home() {
       {/* 2. Statement, read by scrolling. */}
       <Manifesto />
 
-      {/* 3. Ventures: copy pinned on the left, the list on the right. */}
-      <FieldSection form="rest" side={0} dim={0.5}>
-        <Section spacing="lg">
-          <div className="grid gap-14 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-20">
-            <div className="md:sticky md:top-28 md:self-start">
-              <Reveal>
-                <Text as="p" size="caption" tone="subtle">
-                  Ventures
-                </Text>
-                <Heading as="h2" size="h1" className="mt-4">
-                  Building in the open.
-                </Heading>
-                <Text size="lg" tone="muted" className="mt-8">
-                  I don&apos;t rank these by success, and I don&apos;t treat
-                  them like finished resume lines. This is a record of the
-                  evolution, not a highlight reel.
-                </Text>
-              </Reveal>
-            </div>
-            <Reveal delay={0.1}>
-              <VentureList />
-            </Reveal>
-          </div>
-        </Section>
-      </FieldSection>
-
-      {/* 4. About: one big line, one quiet column. */}
-      <FieldSection form="galaxy" side={0} dim={0.55}>
-        <Section spacing="lg" className="flex min-h-[80svh] items-center">
-          <div className="grid w-full gap-12 md:grid-cols-2 md:items-end md:gap-20">
+      {/* 3. One closing section: the line, then the doors to everything
+          else. The pages themselves hold the content, so it is not repeated
+          here. */}
+      <FieldSection form="galaxy" side={0} dim={0.85}>
+        <Section spacing="lg" className="flex min-h-[90svh] items-center">
+          <div className="w-full">
             <Reveal>
-              <Text as="p" size="caption" tone="subtle">
-                About
-              </Text>
               <InkHeading
                 as="h2"
                 size="display"
-                className="mt-4"
                 style={DISPLAY_STYLE}
                 text="Karma, not categories."
               />
             </Reveal>
             <Reveal delay={0.1}>
-              <Text size="lg" tone="muted">
-                I&apos;m Vinayak. I don&apos;t do life in parts.
-              </Text>
-              <Text size="lg" tone="muted" className="mt-6">
-                I live to live. Everything else — the startups, the projects,
-                the content, the wins and the ones nobody sees — is just that,
-                in disguise.
-              </Text>
-              <div className="mt-8">
-                <Button variant="outline" href="/about">
-                  Read more
-                </Button>
+              <div className="mt-14 md:mt-20">
+                <BigLinks />
               </div>
             </Reveal>
           </div>
-        </Section>
-      </FieldSection>
-
-      {/* 5. Connect: two big doors. */}
-      <FieldSection form="bridge" side={0} dim={0.5}>
-        <Section spacing="lg">
-          <Reveal>
-            <Text as="p" size="caption" tone="subtle" className="mb-8">
-              Let&apos;s connect
-            </Text>
-            <BigLinks />
-          </Reveal>
         </Section>
       </FieldSection>
     </PageLayout>

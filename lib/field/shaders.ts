@@ -120,8 +120,8 @@ void main() {
   if (r > 1.0) discard;
 
   // Bright core (the dot itself) plus a faint halo in the margin.
-  float core = pow(max(1.0 - r / 0.588, 0.0), 1.7);
-  float halo = pow(1.0 - r, 3.0) * mix(0.2, 0.08, uLight);
+  float core = pow(max(1.0 - r / 0.62, 0.0), 0.9);
+  float halo = pow(1.0 - r, 3.0) * mix(0.28, 0.14, uLight);
   float a = core + halo;
 
   vec3 col = mix(uColA, uColB, vMix);
