@@ -29,6 +29,7 @@ uniform float uTime;
 uniform float uSize;
 uniform float uPx;
 uniform float uBurst;
+uniform float uWarp;
 uniform float uJitter;
 uniform float uFlow;
 uniform float uAgitate;
@@ -86,6 +87,9 @@ void main() {
   vec2 away = dm / (d + 0.0001);
   mv.xy += away * rep * rep * 0.5;
   mv.xy += vec2(-away.y, away.x) * rep * 0.18;
+
+  // Fast scrolling streaks the field along the scroll direction.
+  mv.y -= uWarp * (0.15 + aRand.w) * 1.3;
 
   gl_Position = uProj * mv;
 

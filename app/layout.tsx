@@ -8,6 +8,7 @@ import AmbientGlow from "@/components/effects/AmbientGlow";
 import Cursor from "@/components/effects/Cursor";
 import ScrollProgress from "@/components/effects/ScrollProgress";
 import FieldProvider from "@/providers/FieldProvider";
+import KeyNav from "@/components/navigation/KeyNav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -58,6 +59,7 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <FieldProvider />
+          <KeyNav />
           <AmbientGlow />
           <div aria-hidden="true" className="grain-overlay" />
           <ScrollProgress />

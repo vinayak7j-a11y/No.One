@@ -397,3 +397,22 @@
   background: color-mix(in srgb, var(--field-accent, #3b82f6) 35%, transparent);
   color: var(--foreground);
 }
+
+
+/* Theme switch: the new theme spreads from the toggle as a circle. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-new(root) {
+  animation: theme-wave 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes theme-wave {
+  from {
+    clip-path: circle(0 at var(--wave-x, 50%) var(--wave-y, 0%));
+  }
+  to {
+    clip-path: circle(150vmax at var(--wave-x, 50%) var(--wave-y, 0%));
+  }
+}

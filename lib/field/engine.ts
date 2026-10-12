@@ -114,6 +114,7 @@ export class FieldEngine {
 
   private scrollPrev = 0;
   private agitate = 0;
+  private warp = 0;
   private started = false;
   private lightBoost = 1;
   private drawCount: number;
@@ -262,7 +263,8 @@ export class FieldEngine {
       this.progress >= 1 &&
       Math.abs(this.burst) < 0.004 &&
       Math.abs(this.burstVel) < 0.02 &&
-      this.agitate < 0.02
+      this.agitate < 0.02 &&
+      Math.abs(this.warp) < 0.02
     );
   }
 
@@ -331,12 +333,19 @@ export class FieldEngine {
     this.sy += ((active ? f.pointer.y : 0) - this.sy) * damp(3);
 
     // Scroll speed shakes the field and pulls the camera back a little.
+    const warpPrev = this.scrollPrev;
     const speed = Math.abs(f.scrollY - this.scrollPrev) / Math.max(dt, 0.001);
     this.scrollPrev = f.scrollY;
     const agitateTarget = f.reduced ? 0 : Math.min(speed / 2500, 1.4);
     this.agitate +=
       (agitateTarget - this.agitate) *
       damp(agitateTarget > this.agitate ? 8 : 2.5);
+
+    // The same scroll, signed: particles streak along it, then settle.
+    const warpTarget = f.reduced
+      ? 0
+      : Math.max(-1.4, Math.min(1.4, (f.scrollY - warpPrev) / Math.max(dt, 0.001) / 2600));
+    this.warp += (warpTarget - this.warp) * damp(Math.abs(warpTarget) > Math.abs(this.warp) ? 9 : 3.2);
 
     const parallax = cfg.parallax;
     modelView(
@@ -405,6 +414,7 @@ export class FieldEngine {
     gl.uniform1f(l("uJitter"), this.jitter);
     gl.uniform1f(l("uFlow"), this.flow);
     gl.uniform1f(l("uAgitate"), this.agitate);
+    gl.uniform1f(l("uWarp"), this.warp);
     gl.uniform1f(l("uAssemble"), this.assemble);
     gl.uniform3f(l("uMouse"), this.uMouse[0], this.uMouse[1], -7);
     gl.uniform3f(l("uColA"), this.colA[0], this.colA[1], this.colA[2]);

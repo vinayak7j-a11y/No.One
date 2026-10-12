@@ -19,11 +19,14 @@ interface FieldCanvasProps {
 const HALF_HEIGHT = Math.tan((FIELD_FOV / 2) * (Math.PI / 180)) * FIELD_CAMERA_Z;
 const IDLE_FRAME_MS = 1000 / 30;
 
+/**
+ * The page background for each theme (the --background token in
+ * globals.css). Not read from computed style: when the theme changes this
+ * runs before next-themes has switched the class on <html>, and would
+ * return the previous theme's colour.
+ */
 function readBackground(theme: "dark" | "light") {
-  const value = getComputedStyle(document.documentElement)
-    .getPropertyValue("--background")
-    .trim();
-  return value || (theme === "dark" ? "#000000" : "#ffffff");
+  return theme === "dark" ? "#000000" : "#ffffff";
 }
 
 function smoothstep(a: number, b: number, x: number) {

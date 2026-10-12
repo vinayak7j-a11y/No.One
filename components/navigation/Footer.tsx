@@ -18,6 +18,10 @@ export default function Footer() {
         <div className="flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between">
           <Text size="sm" tone="muted">
             © {year} Vinayak Joshi. All rights reserved.
+            <span className="ml-4 hidden md:inline">
+              Press <kbd className="font-mono text-foreground">g</kbd> then a
+              letter to travel.
+            </span>
           </Text>
 
           <nav className="flex flex-wrap items-center gap-6">
