@@ -23,21 +23,18 @@ const pageVariants: Variants = {
   enter: (direction: Direction) => ({
     opacity: 0,
     y: direction === 1 ? 48 : -48,
-    scale: 0.97,
-    filter: "blur(6px)",
+    scale: 0.985,
   }),
   center: {
     opacity: 1,
     y: 0,
     scale: 1,
-    filter: "blur(0px)",
     transition: { type: "spring", stiffness: 150, damping: 20, mass: 0.9 },
   },
   exit: (direction: Direction) => ({
     opacity: 0,
     y: direction === 1 ? -32 : 32,
-    scale: 0.96,
-    filter: "blur(4px)",
+    scale: 0.985,
     transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] },
   }),
 };
